@@ -17,7 +17,7 @@ const handler = (
   if (method === 'GET') {
     return res.status(200).json({
       message: '모든 보드들을 가져왔습니다.',
-      data: boards,
+      data: boards.sort((a, b) => +a.order - +b.order),
     });
   }
   // 보드 생성
@@ -31,6 +31,8 @@ const handler = (
       description,
       createdAt: new Date(),
       updatedAt: new Date(),
+
+      order: boards.length + 1,
     });
 
     const createdBoard = boards[boards.length - 1];
