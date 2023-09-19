@@ -2,11 +2,19 @@
 
 import { faker } from '@faker-js/faker';
 
-import type { Board } from '@/types/entities';
+import type { Board, Category } from '@/types/entities';
 
 type GetBoardsHandler = (count: number) => Board[];
 
-const categories = ['신규', '검토중', '서류 합격', '1차 면접', '2차 면접', '최종합격', '불합격'];
+const categories: Category[] = [
+  'new',
+  'review',
+  // 'documentPass',
+  // 'firstInterview',
+  // 'secondInterview',
+  // 'finalPass',
+  // 'failure',
+];
 const getCategory = () => categories[Math.floor(Math.random() * categories.length)];
 
 export const getBoards: GetBoardsHandler = (count: number) =>
@@ -15,10 +23,12 @@ export const getBoards: GetBoardsHandler = (count: number) =>
     .map((_, i) => ({
       idx: i + 1,
       category: getCategory(),
-      title: faker.lorem.word(),
+      title: faker.lorem.word() + ' - ' + i,
       description: faker.lorem.paragraph(),
       createdAt: faker.date.past(),
       updatedAt: faker.date.past(),
+
+      order: i,
     }));
 
-export const boards = getBoards(40);
+export const boards = getBoards(10);

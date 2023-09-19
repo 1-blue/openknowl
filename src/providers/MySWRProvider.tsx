@@ -12,7 +12,7 @@ class MyNetworkError extends Error {
 
 /** 2023/09/18 - `swr`에서 사용할 공통 `fetcher` - by 1-blue */
 const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
-  const res = await fetch(input, init);
+  const res = await fetch(process.env['NEXT_PUBLIC_END_POINT'] + input, init);
 
   if (!res.ok) {
     const error = new MyNetworkError('My Network Error');

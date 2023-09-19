@@ -1,4 +1,4 @@
-import type { ApiResponse, Board } from '..';
+import type { ApiResponse, Board, Category } from '..';
 
 /** 2023/09/18 - 특정 보드 요청 타입 - by 1-blue */
 export interface ApiFindOneBoardRequest {
@@ -30,3 +30,12 @@ export interface ApiDeleteBoardRequest {
 }
 /** 2023/09/18 - 특정 보드 제거 응답 타입 - by 1-blue */
 export interface ApiDeleteBoardResponse extends ApiResponse<Board> {}
+
+/** 2023/09/19 - 특정 보드 이동 요청 타입 - by 1-blue */
+export interface ApiMoveBoardRequest {
+  idx: number;
+  order: number;
+  category: Category;
+}
+/** 2023/09/19 - 특정 보드 이동 응답 타입 - by 1-blue */
+export interface ApiMoveBoardResponse extends ApiResponse<Board> {}
