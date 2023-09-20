@@ -1,10 +1,10 @@
-import { boards } from '@/utils/dummy';
-
-import type { Board, Override } from '@/types';
+import type { Board } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import type { Override } from '@/types';
 import type { ApiCreateBoardResponse, ApiFindAllBoardsResponse } from '@/types/apis';
+import prisma from '@/prisma';
 
-const handler = (
+const handler = async (
   req: Override<
     NextApiRequest,
     { body: Pick<Board, 'idx' | 'category' | 'title' | 'description'> }
@@ -15,27 +15,27 @@ const handler = (
 
   // 모든 보드 찾기
   if (method === 'GET') {
+    const boards = await prisma.board.findMany({ orderBy: [{ order: 'asc' }] });
+
     return res.status(200).json({
       message: '모든 보드들을 가져왔습니다.',
-      data: boards.sort((a, b) => +a.order - +b.order),
+      data: boards,
     });
   }
   // 보드 생성
   else if (method === 'POST') {
     const { category, title, description } = req.body;
 
-    boards.push({
-      idx: boards.length + 1,
-      category,
-      title,
-      description,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    const count = await prisma.board.count({ where: { category } });
 
-      order: boards.length + 1,
+    const createdBoard = await prisma.board.create({
+      data: {
+        category,
+        title,
+        description,
+        order: count,
+      },
     });
-
-    const createdBoard = boards[boards.length - 1];
 
     return res.status(201).json({
       message: `"${title}" 보드가 생성되었습니다.`,

@@ -1,4 +1,5 @@
-import type { ApiResponse, Board, Category } from '..';
+import type { Board, Category } from '@prisma/client';
+import type { ApiResponse } from '..';
 
 /** 2023/09/18 - 특정 보드 요청 타입 - by 1-blue */
 export interface ApiFindOneBoardRequest {
