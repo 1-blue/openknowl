@@ -1,4 +1,4 @@
-import { Category } from '@prisma/client';
+import { Category, Platform } from '@prisma/client';
 
 type BoardTable = {
   [key in Category]: string;
@@ -23,7 +23,6 @@ export const boardCategoryColorTable: BoardTable = {
   FINAL_PASS: '#c7d2fe',
   FAILURE: '#fecdd3',
 };
-
 /** 2023/09/20 - 카테고리들 - by 1-blue */
 export const categories: Category[] = [
   'NEW',
@@ -34,3 +33,14 @@ export const categories: Category[] = [
   'FINAL_PASS',
   'FAILURE',
 ];
+type PlatformTable = {
+  [key in Platform]: string;
+};
+/** 2023/09/20 - 플렛폼 언어 테이블 - by 1-blue */
+export const platformNameTable: PlatformTable = {
+  WANTED: '원티드',
+  SARAMIN: '사람인',
+  ROCKETPUNCH: '로켓펀치',
+  MINIINTERN: '미니인턴',
+  JOBPLANET: '잡플래닛',
+};

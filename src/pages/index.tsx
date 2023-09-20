@@ -44,11 +44,8 @@ const Home = () => {
         <Board.Container boards={boards}>
           {categories.map(category => (
             <Board.Wrapper key={category} droppableId={category} category={category}>
-              {boardsGroup[category].map(({ idx, title, description, order }) => (
-                <Board.Element key={order} draggableId={idx + ''} index={order}>
-                  <h6 className="board-title">{title}</h6>
-                  <p className="board-description">{description}</p>
-                </Board.Element>
+              {boardsGroup[category].map(({ idx, order, ...restProps }) => (
+                <Board.Element key={order} draggableId={idx + ''} index={order} {...restProps} />
               ))}
             </Board.Wrapper>
           ))}

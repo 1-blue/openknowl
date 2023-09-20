@@ -25,21 +25,19 @@ const handler = async (
   // 특정 보드 찾기
   if (method === 'GET') {
     res.status(200).json({
-      message: `"${exBoard.title}" 보드를 찾았습니다.`,
+      message: `"${exBoard.name}" 보드를 찾았습니다.`,
       data: exBoard,
     });
   }
   // 특정 보드 수정
   else if (method === 'PATCH') {
-    const { category, title, description } = req.body;
-
     const updatedBoard = await prisma.board.update({
       where: { idx },
-      data: { category, title, description },
+      data: { ...req.body },
     });
 
     return res.status(200).json({
-      message: `"${exBoard.title}" 보드가 수정되었습니다.`,
+      message: `"${exBoard.name}" 보드가 수정되었습니다.`,
       data: updatedBoard,
     });
   }
@@ -48,7 +46,7 @@ const handler = async (
     const removedBoard = await prisma.board.delete({ where: { idx } });
 
     return res.status(200).json({
-      message: `"${removedBoard.title}" 보드를 제거했습니다.`,
+      message: `"${removedBoard.name}" 보드를 제거했습니다.`,
       data: removedBoard,
     });
   }

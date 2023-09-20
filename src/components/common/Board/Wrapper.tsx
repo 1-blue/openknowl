@@ -1,7 +1,6 @@
-import { Category } from '@/types';
 import { Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
-
+import type { Category } from '@prisma/client';
 import type { DroppableProps } from 'react-beautiful-dnd';
 
 import { boardCategoryColorTable, boardCategoryNameTable } from '@/utils/board';
@@ -16,7 +15,7 @@ const StyledWrapper = styled.section<{ category: Category }>`
 
   border-radius: 0.2em;
 
-  & > .board-wrapper-title {
+  & > .board-wrapper-top {
     display: flex;
     align-items: center;
 
@@ -26,7 +25,9 @@ const StyledWrapper = styled.section<{ category: Category }>`
       margin-left: 0.2em;
     }
 
-    & > .board-wrapper-checkbox {
+    & > #board-wrapper-checkbox {
+      width: 20px;
+      height: 20px;
     }
     & > .board-wrapper-checkbox-label {
       padding: 0.4em 0.6em;
@@ -37,6 +38,23 @@ const StyledWrapper = styled.section<{ category: Category }>`
       font-size: ${({ theme }) => theme.fontSize.xs};
 
       background-color: ${({ category }) => boardCategoryColorTable[category]};
+    }
+    & > .board-append-button {
+      margin-left: auto;
+      padding: 0.4em 0.6em;
+
+      font-weight: 700;
+      color: ${({ theme }) => theme.colors.main400};
+      border: 2px solid ${({ theme }) => theme.colors.main300};
+      border-radius: 0.6em;
+
+      transition: all 0.4s;
+      cursor: pointer;
+
+      &:hover {
+        color: ${({ theme }) => theme.colors.main600};
+        border: 2px solid ${({ theme }) => theme.colors.main500};
+      }
     }
   }
 
@@ -64,11 +82,15 @@ const Wrapper: React.FC<React.PropsWithChildren<WrapperProps>> = ({
 }) => {
   return (
     <StyledWrapper category={category}>
-      <form className="board-wrapper-title">
+      <form className="board-wrapper-top">
         <input type="checkbox" id="board-wrapper-checkbox" />
         <label htmlFor="board-wrapper-checkbox" className="board-wrapper-checkbox-label">
           {boardCategoryNameTable[category]}
         </label>
+
+        <button type="button" className="board-append-button">
+          + 보드 추가
+        </button>
       </form>
 
       <Droppable {...restProps}>

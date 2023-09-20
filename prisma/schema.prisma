@@ -17,12 +17,28 @@ enum Category {
   FAILURE
 }
 
+enum Platform {
+  WANTED
+  SARAMIN
+  ROCKETPUNCH
+  MINIINTERN
+  JOBPLANET
+}
+
 model Board {
   idx Int @id @default(autoincrement())
-  category Category
-  title String
-  description String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  category Category
+  name String
+  platform Platform
+  tags Tag[]
+  date DateTime
   order Int
+}
+
+model Tag {
+  idx Int @id @default(autoincrement())
+  tag String @unique
+  boards Board[]
 }

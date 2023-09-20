@@ -1,25 +1,31 @@
-import type { Board, Category } from '@prisma/client';
+import type { Board, Category, Tag } from '@prisma/client';
 import type { ApiResponse } from '..';
+
+export interface BoardWithTags extends Board {
+  tags: Tag[];
+}
 
 /** 2023/09/18 - 특정 보드 요청 타입 - by 1-blue */
 export interface ApiFindOneBoardRequest {
   idx: number;
 }
 /** 2023/09/18 - 특정 보드 응답 타입 - by 1-blue */
-export interface ApiFindOneBoardResponse extends ApiResponse<Board> {}
+export interface ApiFindOneBoardResponse extends ApiResponse<BoardWithTags> {}
 
 /** 2023/09/18 - 모든 보드 요청 타입 - by 1-blue */
 export interface ApiFindAllBoardsRequest {}
 /** 2023/09/18 - 모든 보드 응답 타입 - by 1-blue */
-export interface ApiFindAllBoardsResponse extends ApiResponse<Board[]> {}
+export interface ApiFindAllBoardsResponse extends ApiResponse<BoardWithTags[]> {}
 
 /** 2023/09/18 - 특정 보드 생성 요청 타입 - by 1-blue */
-export interface ApiCreateBoardRequest extends Pick<Board, 'category' | 'title' | 'description'> {}
+export interface ApiCreateBoardRequest
+  extends Pick<Board, 'category' | 'name' | 'platform' | 'date'> {}
 /** 2023/09/18 - 특정 보드 생성 응답 타입 - by 1-blue */
 export interface ApiCreateBoardResponse extends ApiResponse<Board> {}
 
 /** 2023/09/18 - 특정 보드 수정 요청 타입 - by 1-blue */
-export interface ApiUpdateBoardRequest extends Pick<Board, 'category' | 'title' | 'description'> {
+export interface ApiUpdateBoardRequest
+  extends Pick<Board, 'category' | 'name' | 'platform' | 'date'> {
   idx: number;
 }
 /** 2023/09/18 - 특정 보드 수정 응답 타입 - by 1-blue */

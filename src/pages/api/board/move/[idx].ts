@@ -55,7 +55,7 @@ const handler = async (
     const updatedBoard = await prisma.board.update({ where: { idx }, data: { category, order } });
 
     return res.status(200).json({
-      message: `"${exBoard.title}" 보드가 "${category}"로 이동되었습니다.`,
+      message: `"${exBoard.name}" 보드가 "${category}"로 이동되었습니다.`,
       data: updatedBoard,
     });
   }

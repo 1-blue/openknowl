@@ -14,6 +14,12 @@ export const GlobalStyle = createGlobalStyle`
     background-color: ${({ theme }) => theme.colors.bg};
   }
 
+  button[type="button"] {
+    background-color: transparent;
+    border: 0px solid transparent;
+    cursor: pointer;
+  }
+
   @media ${({ theme }) => theme.mediaSize.md} {
     html {
       font-size: 14px;

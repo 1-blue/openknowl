@@ -7,7 +7,7 @@ import prisma from '@/prisma';
 const handler = async (
   req: Override<
     NextApiRequest,
-    { body: Pick<Board, 'idx' | 'category' | 'title' | 'description'> }
+    { body: Pick<Board, 'idx' | 'category' | 'name' | 'platform' | 'date'> }
   >,
   res: NextApiResponse<ApiCreateBoardResponse | ApiFindAllBoardsResponse>,
 ) => {
@@ -15,7 +15,10 @@ const handler = async (
 
   // 모든 보드 찾기
   if (method === 'GET') {
-    const boards = await prisma.board.findMany({ orderBy: [{ order: 'asc' }] });
+    const boards = await prisma.board.findMany({
+      orderBy: [{ order: 'asc' }],
+      include: { tags: true },
+    });
 
     return res.status(200).json({
       message: '모든 보드들을 가져왔습니다.',
@@ -24,21 +27,25 @@ const handler = async (
   }
   // 보드 생성
   else if (method === 'POST') {
-    const { category, title, description } = req.body;
+    const { category, name, platform, date } = req.body;
 
     const count = await prisma.board.count({ where: { category } });
 
     const createdBoard = await prisma.board.create({
       data: {
         category,
-        title,
-        description,
+        name,
+        platform,
+        date,
         order: count,
+      },
+      include: {
+        tags: true,
       },
     });
 
     return res.status(201).json({
-      message: `"${title}" 보드가 생성되었습니다.`,
+      message: `"${name}" 보드가 생성되었습니다.`,
       data: createdBoard,
     });
   }
