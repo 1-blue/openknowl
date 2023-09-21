@@ -322,6 +322,14 @@ const animation = {
       background-color: rgba(165, 165, 165, 0.5);
     }
   `,
+  fadeIn: keyframes`
+    0% {
+      opacity: 0.01;
+    }
+    100% {
+      opacity: 1;
+    }
+  `,
 };
 
 /** "styled-components"의 각종 설정 값 */

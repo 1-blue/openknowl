@@ -45,6 +45,12 @@ const handler = async (
   else if (method === 'DELETE') {
     const removedBoard = await prisma.board.delete({ where: { idx } });
 
+    // 순서 변경
+    await prisma.board.updateMany({
+      where: { order: { gt: exBoard.order }, category: exBoard.category },
+      data: { order: { decrement: 1 } },
+    });
+
     return res.status(200).json({
       message: `"${removedBoard.name}" 보드를 제거했습니다.`,
       data: removedBoard,

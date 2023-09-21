@@ -3,11 +3,16 @@ import styled from 'styled-components';
 import { apiMoveBoard } from '@/apis';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 
+import { useAppSelector } from '@/store';
+
+import Overlay from '@/components/common/Overlay';
+import Modal from '@/components/common/Modal';
+import BoardForm from '@/components/Board/BoardForm';
+
 import type { Board, Category } from '@prisma/client';
 
 const StyledContainer = styled.article`
-  display: flex;
-  justify-content: space-between;
+  display: inline-flex;
 
   padding: 1em 0.4em;
 
@@ -22,6 +27,8 @@ interface ContainerProps {
 
 /** 2023/09/19 - 보드들의 래퍼 컴포넌트들을 감싸는 컨테이너 컴포넌트 - by 1-blue */
 const Container: React.FC<React.PropsWithChildren<ContainerProps>> = ({ boards, children }) => {
+  const { isShow } = useAppSelector(state => state.boardModal);
+
   /** 2023/09/19 - `<Draggable>`이 `<Droppable>`로 드래그 되었을 때 실행되는 이벤트 - by 1-blue */
   const onDragEnd = async ({ source, destination, draggableId }: DropResult) => {
     // 잘못된 공간에 드랍한 경우
@@ -49,6 +56,14 @@ const Container: React.FC<React.PropsWithChildren<ContainerProps>> = ({ boards, 
   return (
     <StyledContainer>
       <DragDropContext onDragEnd={onDragEnd}>{children}</DragDropContext>
+
+      {isShow && (
+        <Overlay>
+          <Modal>
+            <BoardForm />
+          </Modal>
+        </Overlay>
+      )}
     </StyledContainer>
   );
 };

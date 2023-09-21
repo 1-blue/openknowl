@@ -1,12 +1,12 @@
 import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 
-import counterReducer from '@/store/slices/counter';
+import boardModal from '@/store/slices/boardModal';
 
 /** 2023/09/18 - `redux`의 `store` - by 1-blue */
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
+    boardModal: boardModal,
   },
 });
 
