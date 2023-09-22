@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
 const StyledTag = styled.section`
@@ -71,24 +72,28 @@ const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
     e.stopPropagation();
     e.preventDefault();
 
-    // 2. 태그 수 제한
+    // 태그 수 제한
     if (tags.length >= 10) {
-      // TODO: toast
-      alert('태그는 최대 10개까지 등록이 가능합니다.');
+      toast.warning('태그는 최대 10개까지 등록이 가능합니다.');
+      return;
     }
 
     // 태그 글자 수 제한
     if (e.target.value.length >= 10) {
-      // TODO: toast
-      alert('글자는 최대 10자까지 입력이 가능합니다.');
+      toast.warning(
+        '글자는 최대 10자까지 입력이 가능합니다.' + `( ${e.target.value.length} / 10 )`,
+      );
       e.target.select();
+      return;
     }
 
-    // 3. "#" 붙이기
+    // "#" 붙이기
     createTag('#' + e.target.value);
 
     // FIXME: 한글 두 번 등록되는 문제 해결하기
+    // 앞에 # 붙이면 제거하기
 
+    // 초기화
     e.target.value = '';
   };
 
@@ -96,8 +101,10 @@ const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
     if (!(e.target instanceof HTMLElement)) return;
     if (!e.target.dataset.tag) return;
 
-    // TODO: toast
-    removeTag(e.target.dataset.tag);
+    const { tag } = e.target.dataset;
+
+    toast.success(`"${tag}"를 제거했습니다.`);
+    removeTag(tag);
   };
 
   return (

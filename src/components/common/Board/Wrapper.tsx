@@ -1,14 +1,12 @@
 import { Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
-import type { Category } from '@prisma/client';
 import type { DroppableProps } from 'react-beautiful-dnd';
 
 import { useAppDispatch } from '@/store';
 import { openBoardModal } from '@/store/slices/boardModal';
+import { boardCategoryColorTable } from '@/utils/board';
 
-import { boardCategoryColorTable, boardCategoryNameTable } from '@/utils/board';
-
-const StyledWrapper = styled.section<{ category: Category }>`
+const StyledWrapper = styled.section<{ category: string }>`
   flex: 1;
   width: 240px;
 
@@ -74,7 +72,7 @@ const StyledWrapper = styled.section<{ category: Category }>`
 
 //? children이 중복되어서 제외함
 interface WrapperProps extends Omit<DroppableProps, 'children'> {
-  category: Category;
+  category: string;
 }
 
 /** 2023/09/19 - 보드들을 감싸는 래퍼 컴포넌트 ( 보드를 사용하기 위한 설정들 적용 ) - by 1-blue */
@@ -90,7 +88,7 @@ const Wrapper: React.FC<React.PropsWithChildren<WrapperProps>> = ({
       <form className="board-wrapper-top">
         <input type="checkbox" id="board-wrapper-checkbox" />
         <label htmlFor="board-wrapper-checkbox" className="board-wrapper-checkbox-label">
-          {boardCategoryNameTable[category]}
+          {category}
         </label>
 
         <button

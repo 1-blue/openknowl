@@ -10,7 +10,7 @@ const handler = async (
   const { method } = req;
   const idx = +req.query.idx;
 
-  const exBoard = await prisma.board.findUnique({ where: { idx } });
+  const exBoard = await prisma.board.findUnique({ where: { idx }, include: { category: true } });
 
   if (!exBoard) {
     return res.status(404).json({
@@ -20,24 +20,26 @@ const handler = async (
 
   // 특정 보드 이동
   if (method === 'PATCH') {
-    const { category, order } = req.body;
+    const { order, category } = req.body;
 
     // 다른 보드 이동인 경우
-    if (category !== exBoard.category) {
+    if (category !== exBoard.category.category) {
       // 출발 보드 수정
       await prisma.board.updateMany({
-        where: { order: { gt: exBoard.order }, category: exBoard.category },
+        where: { order: { gt: exBoard.order }, categoryIdx: exBoard.categoryIdx },
         data: { order: { decrement: 1 } },
       });
       // 도착 보드 수정
       await prisma.board.updateMany({
-        where: { order: { gte: order }, category },
+        where: { order: { gte: order }, category: { category } },
         data: { order: { increment: 1 } },
       });
     }
     // 같은 보드 이동
     else {
-      const targetBoard = await prisma.board.findFirst({ where: { category, order } });
+      const targetBoard = await prisma.board.findFirst({
+        where: { category: { category }, order },
+      });
       if (!targetBoard) return;
 
       await Promise.allSettled([
@@ -52,10 +54,14 @@ const handler = async (
       ]);
     }
 
-    const updatedBoard = await prisma.board.update({ where: { idx }, data: { category, order } });
+    const updatedBoard = await prisma.board.update({
+      where: { idx },
+      data: { category: { connect: { category } }, order },
+      include: { category: true },
+    });
 
     return res.status(200).json({
-      message: `"${exBoard.name}" 보드가 "${category}"로 이동되었습니다.`,
+      message: `"${exBoard.name}" 보드가 "${updatedBoard.category.category}"로 이동되었습니다.`,
       data: updatedBoard,
     });
   }

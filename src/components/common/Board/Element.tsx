@@ -3,16 +3,19 @@ import { mutate } from 'swr';
 import { Draggable } from 'react-beautiful-dnd';
 import { IoEllipsisVerticalSharp, IoTimeOutline } from 'react-icons/io5';
 import styled, { css } from 'styled-components';
+import { toast } from 'react-toastify';
 
 import { apiDeleteBoard } from '@/apis';
 
+import { useAppDispatch } from '@/store';
+import { openBoardModal } from '@/store/slices/boardModal';
+
 import { dateFormat, timeFormat } from '@/utils/time';
-import { platformNameTable } from '@/utils/board';
 
 import BoardDialog from '@/components/Board/BoardDialog';
 
 import type { DraggableProps } from 'react-beautiful-dnd';
-import type { ApiFindAllBoardsResponse, BoardWithTags } from '@/types/apis';
+import type { BoardWithETC } from '@/types/apis';
 
 const StyledElement = styled.li<{ isDragging: boolean }>`
   position: relative;
@@ -111,7 +114,7 @@ const StyledElement = styled.li<{ isDragging: boolean }>`
 
 interface ElementProps
   extends Omit<DraggableProps, 'children'>,
-    Pick<BoardWithTags, 'idx' | 'name' | 'date' | 'platform' | 'tags'> {
+    Pick<BoardWithETC, 'idx' | 'name' | 'date' | 'category' | 'platform' | 'tags'> {
   index: number;
 }
 
@@ -125,6 +128,8 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
   children,
   ...restProps
 }) => {
+  const dispatch = useAppDispatch();
+
   const [isShowDialog, setIsShowDialog] = useState(false);
 
   /** 2023/09/21 - Dialog 닫기 - by 1-blue */
@@ -150,21 +155,17 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
 
     // 수정
     if (type === 'update') {
-      // TODO: 수정 모달 띄우기
+      dispatch(openBoardModal({ idx }));
     }
     // 삭제
     if (type === 'delete') {
-      apiDeleteBoard({ idx }).then(() => {
-        // TODO: toast
-        // TODO: 삭제된 보드의 order 변경
-        mutate<ApiFindAllBoardsResponse, ApiFindAllBoardsResponse>(
-          '/board',
-          boards =>
-            boards && {
-              ...boards,
-              data: boards.data && boards.data.filter(board => board.idx !== idx),
-            },
-        );
+      apiDeleteBoard({ idx }).then(({ message, data }) => {
+        if (!data) return;
+
+        toast.success(message);
+
+        // TODO:
+        mutate('/board');
       });
     }
   };
@@ -189,7 +190,7 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
               onClick={onOpenDialog}
             />
           </div>
-          <span className="board-platform">{platformNameTable[platform]}</span>
+          <span className="board-platform">{platform.platform}</span>
           <ul className="board-tag-container">
             {tags.map(({ tag }) => (
               <li key={tag} className="board-tag">

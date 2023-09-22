@@ -1,4 +1,7 @@
+import { toast } from 'react-toastify';
 import { SWRConfig } from 'swr';
+
+import type { ApiResponse } from '@/types';
 
 /** 2023/09/18 - 네트워크 에러에 사용할 커스텀 에러 클래스 - by 1-blue */
 class MyNetworkError extends Error {
@@ -27,19 +30,17 @@ const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
 /** 2023/09/18 - `swr`에서 사용할 공통 `Error` 핸들러 - by 1-blue */
 const onError = (error: Error, key: string) => {
   if (error instanceof MyNetworkError) {
-    // TODO: toast
+    toast.error(error.info);
     console.error('My Network Error >> ', key, error.info);
   } else {
-    // TODO: toast
+    toast.error(error.message);
     console.error('Unknown Error >> ', error);
   }
 };
 
 // TODO: data 타입 변경하기
-const onSuccess = (data: any, key: string) => {
-  // TODO: toast
-  data;
-  key;
+const onSuccess = (data: ApiResponse<object>) => {
+  data.message && toast.success(data.message);
 };
 
 interface MySWRProviderProps {

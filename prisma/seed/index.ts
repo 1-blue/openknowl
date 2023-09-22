@@ -1,22 +1,31 @@
 import { PrismaClient } from '@prisma/client';
 
-import { getBoards, getTags, tags } from './dummy';
+import { getBoards, getCategories, getPlatforms, getTags, tags } from './dummy';
 
 const prisma = new PrismaClient();
 
 async function main() {
   try {
-    // 더미보드와 더미태그 생성
+    // 더미 보드 & 더미 카테고리 & 더미 플랫폼 & 더미 태그 생성
     await Promise.allSettled([
-      prisma.board.createMany({
+      prisma.category.createMany({
         skipDuplicates: true,
-        data: getBoards(),
+        data: getCategories(),
+      }),
+      prisma.platform.createMany({
+        skipDuplicates: true,
+        data: getPlatforms(),
       }),
       prisma.tag.createMany({
         skipDuplicates: true,
         data: getTags(),
       }),
     ]);
+
+    await prisma.board.createMany({
+      skipDuplicates: true,
+      data: getBoards(),
+    });
 
     // 총 보드 개수
     const boardCount = await prisma.board.count();

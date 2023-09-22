@@ -1,43 +1,56 @@
-import type { Board } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { Override } from '@/types';
-import type { ApiCreateBoardResponse, ApiFindAllBoardsResponse } from '@/types/apis';
+import type {
+  ApiCreateBoardRequest,
+  ApiCreateBoardResponse,
+  ApiFindAllBoardsResponse,
+  ApiUpdateBoardRequest,
+} from '@/types/apis';
 import prisma from '@/prisma';
 
 const handler = async (
-  req: Override<
-    NextApiRequest,
-    { body: Pick<Board, 'idx' | 'category' | 'name' | 'platform' | 'date'> }
-  >,
+  req: Override<NextApiRequest, { body: ApiCreateBoardRequest | ApiUpdateBoardRequest }>,
   res: NextApiResponse<ApiCreateBoardResponse | ApiFindAllBoardsResponse>,
 ) => {
   const { method } = req;
 
   // 모든 보드 찾기
   if (method === 'GET') {
-    const boards = await prisma.board.findMany({
-      orderBy: [{ order: 'asc' }],
-      include: { tags: true },
-    });
+    const categories = await prisma.category.findMany();
+
+    const boardsGroup = await Promise.all(
+      categories.map(({ idx }) =>
+        prisma.board.findMany({
+          where: { category: { idx } },
+          orderBy: [{ order: 'asc' }],
+          include: { category: true, platform: true, tags: true },
+        }),
+      ),
+    );
 
     return res.status(200).json({
-      message: '모든 보드들을 가져왔습니다.',
-      data: boards,
+      data: boardsGroup,
     });
   }
   // 보드 생성
   else if (method === 'POST') {
-    const { category, name, platform, date } = req.body;
+    const { name, date, category, platform, tags } = req.body;
 
-    const count = await prisma.board.count({ where: { category } });
+    const count = await prisma.board.count({ where: { category: { category } } });
 
     const createdBoard = await prisma.board.create({
       data: {
-        category,
         name,
-        platform,
-        date,
+        date: new Date(date),
         order: count,
+        category: { connect: { category } },
+        platform: { connect: { platform } },
+        tags: {
+          connectOrCreate: tags.map(tag => ({
+            where: { tag },
+            create: { tag },
+          })),
+        },
       },
       include: {
         tags: true,

@@ -2,16 +2,14 @@ import Head from 'next/head';
 
 import useFetchBoards from '@/hooks/useFetchBoards';
 
-import { categories } from '@/utils/board';
-
 import Board from '@/components/common/Board';
 
 /** 2023/09/18 - 메인 페이지 - by 1-blue */
 const Home = () => {
-  const { boards, isLoading, error } = useFetchBoards();
+  const { boardsGroup, isLoading, error } = useFetchBoards();
 
   //! TODO: 각자 컴포넌트 추가하기
-  if (!boards) {
+  if (!boardsGroup) {
     return <></>;
   }
   if (isLoading) {
@@ -20,13 +18,6 @@ const Home = () => {
   if (error) {
     return <></>;
   }
-
-  // 같은 카테고리끼리 그룹화
-  const boardsGroup: { [key: string]: typeof boards } = {};
-  boards.forEach(board => {
-    boardsGroup[board.category] ?? (boardsGroup[board.category] = []);
-    boardsGroup[board.category].push(board);
-  });
 
   return (
     <>
@@ -41,12 +32,16 @@ const Home = () => {
       <>
         <h1>Hello, Openknowl</h1>
 
-        <Board.Container boards={boards}>
-          {categories.map(category => (
-            <Board.Wrapper key={category} droppableId={category} category={category}>
-              {boardsGroup[category].map(({ idx, order, ...restProps }) => (
+        <Board.Container>
+          {boardsGroup.map(boards => (
+            <Board.Wrapper
+              key={boards[0].category.category}
+              droppableId={boards[0].category.category}
+              category={boards[0].category.category}
+            >
+              {boards.map(({ idx, order, ...restProps }) => (
                 <Board.Element
-                  key={order}
+                  key={idx}
                   draggableId={idx + ''}
                   index={order}
                   idx={idx}

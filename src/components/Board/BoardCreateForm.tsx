@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { IoCloseCircle } from 'react-icons/io5';
+import { toast } from 'react-toastify';
+import { mutate } from 'swr';
+
+import { apiCreateBoard } from '@/apis';
+import useFetchCategories from '@/hooks/useFetchCategoriesOfBoard';
+import useFetchPlatforms from '@/hooks/useFetchPlatformsOfBoard';
 
 import { useAppDispatch, useAppSelector } from '@/store';
 import { closeBoardModal } from '@/store/slices/boardModal';
@@ -12,7 +18,7 @@ import Tag from '@/components/common/Tag';
 
 import type { Board } from '@prisma/client';
 
-const StyledBoardFormWrapper = styled.article`
+const StyledBoardCreateFormWrapper = styled.article`
   position: relative;
 
   & > .board-form-close-button {
@@ -85,37 +91,34 @@ const StyledBoardFormWrapper = styled.article`
   }
 `;
 
-interface CreateBoardBoardForm extends Pick<Board, 'name' | 'date'> {}
+interface BoardCreateForm extends Pick<Board, 'name' | 'date'> {}
 
-// FIXME: 임시
-const categories = ['신규', '검토', '1차면접', '2차면접', '서류합격', '최종합격', '불합격'];
-const platforms = ['원티드', '사람인', '로켓펀치', '미니인턴', '잡플래닛'];
-
-/** 2023/09/20 - Modal BoardForm Component - by 1-blue */
-const BoardForm: React.FC = () => {
+/** 2023/09/20 - Modal BoardCreateForm Component - by 1-blue */
+const BoardCreateForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const { category: defaultCategoty } = useAppSelector(state => state.boardModal);
+
+  const { categories } = useFetchCategories();
+  const { platforms } = useFetchPlatforms();
 
   // name & date
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreateBoardBoardForm>();
+  } = useForm<BoardCreateForm>();
 
   // category
-  const [category, setCategory] = useState(categories[0]);
+  const [category, setCategory] = useState(categories?.[0].category || defaultCategoty);
   // platform
-  const [playforms, setPlatforms] = useState([platforms[0]]);
+  const [platform, setPlatform] = useState(platforms?.[0].platform || '미니인턴');
   // tags
   const [tags, setTags] = useState<string[]>([]);
 
   /** 2023/09/21 - 태그 생성 - by 1-blue */
   const createTag = (tag: string) => {
     if (tags.find(v => v === tag)) {
-      // TODO: toast
-      alert('이미 등록된 태그입니다.');
-      return;
+      return toast.warning('이미 등록된 태그입니다.');
     }
 
     setTags(prev => [...prev, tag]);
@@ -127,11 +130,24 @@ const BoardForm: React.FC = () => {
 
   /** 2023/09/21 - 보드 생성 요청 핸들러 - by 1-blue */
   const createBoard: React.FormEventHandler = handleSubmit(({ name, date }) => {
-    console.log('body >> ', name, date, category, playforms, tags);
+    apiCreateBoard({
+      name,
+      date,
+      category,
+      platform,
+      tags,
+    })
+      .then(({ message }) => {
+        toast.success(message);
+
+        mutate('/board');
+      })
+      // FIXME:
+      .catch(console.error);
   });
 
   return (
-    <StyledBoardFormWrapper>
+    <StyledBoardCreateFormWrapper>
       <IoCloseCircle
         className="board-form-close-button"
         onClick={() => dispatch(closeBoardModal())}
@@ -153,37 +169,55 @@ const BoardForm: React.FC = () => {
           })}
         />
 
-        <Combobox
-          id="카테고리"
-          required
-          defaultValue={{ value: defaultCategoty, label: defaultCategoty }}
-          options={categories.map(category => ({ value: category, label: category }))}
-          onChange={selected => {
-            if (!selected) return;
-            if (selected instanceof Array) return;
+        {categories && (
+          <Combobox
+            id="카테고리"
+            required
+            defaultValue={{
+              value: defaultCategoty,
+              label: defaultCategoty,
+            }}
+            options={categories.map(({ category }) => ({
+              label: category,
+              value: category,
+            }))}
+            onChange={selected => {
+              if (!selected) return;
+              if (selected instanceof Array) return;
 
-            setCategory(selected.value);
-          }}
-        />
+              setCategory(selected.value);
+            }}
+          />
+        )}
 
-        <Combobox
-          isMulti
-          id="플랫폼"
-          required
-          defaultValue={[{ value: platforms[0], label: playforms[0] }]}
-          options={platforms.map(platform => ({ value: platform, label: platform }))}
-          onChange={selected => {
-            if (!selected) return;
-            if (!(selected instanceof Array)) return;
+        {platforms && (
+          <Combobox
+            id="플랫폼"
+            required
+            defaultValue={[
+              {
+                label: platforms?.[0].platform,
+                value: platforms?.[0].platform,
+              },
+            ]}
+            options={platforms.map(({ platform }) => ({
+              label: platform,
+              value: platform,
+            }))}
+            onChange={selected => {
+              if (!selected) return;
+              if (selected instanceof Array) return;
 
-            setPlatforms(selected.map(v => v.value));
-          }}
-        />
+              setPlatform(selected.value);
+            }}
+          />
+        )}
 
         <Input
           type="datetime-local"
           id="마감일"
           required
+          defaultValue={Date.now()}
           error={errors.date?.message}
           {...register('date', {
             required: { value: true, message: '마감일을 입력해주세요!' },
@@ -205,8 +239,8 @@ const BoardForm: React.FC = () => {
           </button>
         </div>
       </form>
-    </StyledBoardFormWrapper>
+    </StyledBoardCreateFormWrapper>
   );
 };
 
-export default BoardForm;
+export default BoardCreateForm;

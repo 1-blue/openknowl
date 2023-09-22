@@ -1,5 +1,3 @@
-import { boardCategoryNameTable } from '@/utils/board';
-import { Category } from '@prisma/client';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
@@ -19,9 +17,11 @@ export const boardModalSlice = createSlice({
   name: 'boardModal',
   initialState,
   reducers: {
-    openBoardModal: (state, action: PayloadAction<{ idx?: number; category: Category }>) => {
+    openBoardModal: (state, action: PayloadAction<{ idx?: number; category?: string }>) => {
       state.isShow = true;
-      state.category = boardCategoryNameTable[action.payload.category];
+      if (action.payload.idx) {
+        state.targetIdx = action.payload.idx;
+      }
       if (action.payload.idx) {
         state.targetIdx = action.payload.idx;
       }
@@ -29,6 +29,7 @@ export const boardModalSlice = createSlice({
     closeBoardModal: state => {
       state.isShow = false;
       state.targetIdx = -1;
+      state.category = '';
     },
   },
 });

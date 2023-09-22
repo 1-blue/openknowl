@@ -7,38 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Category {
-  NEW
-  REVIEW
-  FIRST_INTERVIEW
-  SECOND_INTERVIEW
-  DOCUMENT_PASS
-  FINAL_PASS
-  FAILURE
-}
-
-enum Platform {
-  WANTED
-  SARAMIN
-  ROCKETPUNCH
-  MINIINTERN
-  JOBPLANET
-}
-
 model Board {
   idx Int @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  category Category
   name String
-  platform Platform
-  tags Tag[]
   date DateTime
   order Int
+
+  category Category @relation(fields: [categoryIdx], references: [idx], onUpdate: Cascade, onDelete: Cascade)
+  categoryIdx Int
+  platform Platform @relation(fields: [platformIdx], references: [idx], onUpdate: Cascade, onDelete: Cascade)
+  platformIdx Int
+  tags Tag[]
 }
 
+model Category {
+  idx Int @id @default(autoincrement())
+  category String @unique
+
+  boards Board[]
+}
+model Platform {
+  idx Int @id @default(autoincrement())
+  platform String @unique
+
+  boards Board[]
+}
 model Tag {
   idx Int @id @default(autoincrement())
   tag String @unique
+
   boards Board[]
 }

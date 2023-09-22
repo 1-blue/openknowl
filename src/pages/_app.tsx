@@ -1,3 +1,6 @@
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import GeneralLayout from '@/layouts/GeneralLayout';
 import MyReduxProvider from '@/providers/MyReduxProvider';
 import MySWRProvider from '@/providers/MySWRProvider';
@@ -14,6 +17,8 @@ const App = ({ Component, pageProps }: AppProps) => {
         <MyStyledProvider>
           <GeneralLayout>
             <Component {...pageProps} />
+
+            <ToastContainer autoClose={2000} position="top-center" />
           </GeneralLayout>
         </MyStyledProvider>
       </MySWRProvider>

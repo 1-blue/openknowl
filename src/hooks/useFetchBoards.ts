@@ -6,7 +6,7 @@ import type { ApiFindAllBoardsResponse } from '@/types/apis';
 const useFetchBoards = () => {
   const { data, isLoading, error, mutate } = useSWR<ApiFindAllBoardsResponse>('/board');
 
-  return { boards: data?.data, isLoading, error, boardsMutate: mutate };
+  return { boardsGroup: data?.data, isLoading, error, boardsMutate: mutate };
 };
 
 export default useFetchBoards;
