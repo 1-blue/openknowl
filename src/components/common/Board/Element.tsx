@@ -10,14 +10,14 @@ import { apiDeleteBoard } from '@/apis';
 import { useAppDispatch } from '@/store';
 import { openBoardModal } from '@/store/slices/boardModal';
 
-import { dateFormat, timeFormat } from '@/utils/time';
+import { dateFormat, futureTimeFormat } from '@/utils/time';
 
 import BoardDialog from '@/components/Board/BoardDialog';
 
 import type { DraggableProps } from 'react-beautiful-dnd';
 import type { BoardWithETC } from '@/types/apis';
 
-const StyledElement = styled.li<{ isDragging: boolean }>`
+const StyledElement = styled.li<{ $isDragging: boolean }>`
   position: relative;
   padding: 0.8em 0.6em;
 
@@ -25,8 +25,8 @@ const StyledElement = styled.li<{ isDragging: boolean }>`
   background-color: #fff;
   box-shadow: 0px 0px 6px ${({ theme }) => theme.colors.gray300};
 
-  ${({ isDragging }) =>
-    isDragging &&
+  ${({ $isDragging }) =>
+    $isDragging &&
     css`
       box-shadow: 0px 0px 10px ${({ theme }) => theme.colors.gray500};
     `}
@@ -177,7 +177,7 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          isDragging={snapshot.isDragging}
+          $isDragging={snapshot.isDragging}
         >
           <div className="board-top-container">
             <div className="board-top-wrapper">
@@ -201,7 +201,7 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
           <div className="board-bottom-container">
             <IoTimeOutline className="board-clock" />
             <time className="board-date">
-              {dateFormat(new Date(date), 'YYYY.MM.DD')} (+{timeFormat(new Date(date))})
+              {dateFormat(new Date(date), 'YYYY.MM.DD')} (+{futureTimeFormat(date)})
             </time>
           </div>
           {isShowDialog && (

@@ -330,6 +330,16 @@ const animation = {
       opacity: 1;
     }
   `,
+  bounce: keyframes`
+    0%, 100% {
+      transform: translateY(-25%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(25%);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  `,
 };
 
 /** "styled-components"의 각종 설정 값 */

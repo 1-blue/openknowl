@@ -25,7 +25,7 @@ export const getBoards = (): Prisma.BoardCreateManyInput[] =>
     .fill(null)
     .map((_, index) => ({
       name: faker.person.firstName() + ' - ' + index,
-      date: faker.date.past(),
+      date: faker.date.future(),
       order: Math.floor(index / categories.length),
       categoryIdx: (index % categories.length) + 1,
       platformIdx: Math.floor(Math.random() * platforms.length + 1),

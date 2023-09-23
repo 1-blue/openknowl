@@ -22,8 +22,8 @@ export const boardModalSlice = createSlice({
       if (action.payload.idx) {
         state.targetIdx = action.payload.idx;
       }
-      if (action.payload.idx) {
-        state.targetIdx = action.payload.idx;
+      if (action.payload.category) {
+        state.category = action.payload.category;
       }
     },
     closeBoardModal: state => {

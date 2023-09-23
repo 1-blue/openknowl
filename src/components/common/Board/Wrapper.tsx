@@ -6,7 +6,7 @@ import { useAppDispatch } from '@/store';
 import { openBoardModal } from '@/store/slices/boardModal';
 import { boardCategoryColorTable } from '@/utils/board';
 
-const StyledWrapper = styled.section<{ category: string }>`
+const StyledWrapper = styled.section<{ $category: string }>`
   flex: 1;
   width: 240px;
 
@@ -38,7 +38,7 @@ const StyledWrapper = styled.section<{ category: string }>`
       border-radius: 1em;
       font-size: ${({ theme }) => theme.fontSize.xs};
 
-      background-color: ${({ category }) => boardCategoryColorTable[category]};
+      background-color: ${({ $category }) => boardCategoryColorTable[$category]};
     }
     & > .board-append-button {
       margin-left: auto;
@@ -84,7 +84,7 @@ const Wrapper: React.FC<React.PropsWithChildren<WrapperProps>> = ({
   const dispatch = useAppDispatch();
 
   return (
-    <StyledWrapper category={category}>
+    <StyledWrapper $category={category}>
       <form className="board-wrapper-top">
         <input type="checkbox" id="board-wrapper-checkbox" />
         <label htmlFor="board-wrapper-checkbox" className="board-wrapper-checkbox-label">

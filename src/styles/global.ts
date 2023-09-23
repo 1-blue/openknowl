@@ -6,9 +6,11 @@ export const GlobalStyle = createGlobalStyle`
   ${reset}
 
   body {
+    box-sizing: border-box;
+
     line-height: 1;
-    // TODO:
-    /* font-family: "TheJamsil5", "Noto Sans KR", sans-serif; */
+
+    font-family: "Pretendard", "Noto Sans KR", sans-serif;
 
     color: ${({ theme }) => theme.colors.fg};
     background-color: ${({ theme }) => theme.colors.bg};

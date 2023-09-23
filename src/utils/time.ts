@@ -1,3 +1,6 @@
+export const timer = (time: number) =>
+  new Promise(resolve => setTimeout(() => resolve(time), time));
+
 /**
  * 포멧 형식
  * 년: YY or YYYY
@@ -11,63 +14,11 @@
  */
 
 /**
- * 날짜값을 정해진 포멧 형식으로 변환
- * @param value number | Date
- * @param format 포멧 형식 + 구분자형태로 입력 ex) "YYYY-MM-DD-hh-mm-ss"
- * @param separator 전체적으로 적용할 구분자
- * @returns string형식으로 포멧해서 반환
- */
-export const dateFormat = (
-  value: Date | number,
-  format = 'YYYY-MM-DD-hh-mm-ss',
-  separator?: string,
-) => {
-  const date = new Date(value);
-
-  const dateArray: (number | string | undefined)[] = [];
-  let result = '';
-  /**
-   * 구분자만 추출 ( YYYY년MM월DD일 ---> ["년", "월", "일"] )
-   * 현재 문제는 한글자만 구분자로 입력이 가능함
-   * 이 문제를 해결하기 위해서 3번째 인자로 "separator"를 받고 "separator"가 존재한다면 모든 구분자를 "separator"로 대체함
-   */
-  const separatorList = format.match(/[^YMDhms]/g);
-  let separatorIndex = 0;
-
-  dateArray.push(yearFormat(date, format));
-  dateArray.push(monthFormat(date, format));
-  dateArray.push(dayFormat(date, format));
-  dateArray.push(hourFormat(date, format));
-  dateArray.push(minuteFormat(date, format));
-  dateArray.push(secondFormat(date, format));
-
-  dateArray.forEach(v => {
-    // undefined일 경우 즉, 포멧하지 않거나 잘못된 입력인 경우 제외
-    if (!v) return;
-
-    // 구분자를 정해줬다면
-    if (separator) return (result += `${v}${separator}`);
-    else {
-      let targetSeparator = '';
-
-      if (!separatorList) separator = '';
-      else targetSeparator = separatorList[separatorIndex] || '';
-
-      separatorIndex++;
-
-      result += `${v}${targetSeparator}`;
-    }
-  });
-
-  return result;
-};
-
-/**
- * 날짜값을 현재 시간 기준으로 지난 시간으로 반환
+ * 날짜값을 현재 시간 기준으로 지난 시간으로 반환 ( 과거 )
  * @param value number | Date
  * @returns 지난 시간을 초/분/시/일/개월 단위로 나눠서 string형태로 반환
  */
-export const timeFormat = (value: Date | number) => {
+export const pastTimeFormat = (value: Date | number) => {
   const date = new Date(value);
 
   const temp = new Date().getTime() - date.getTime();
@@ -95,30 +46,38 @@ export const timeFormat = (value: Date | number) => {
   // 1년 이상
   return `${Math.floor(temp / 1000 / 60 / 60 / 24 / 30 / 12)}년`;
 };
-
 /**
- * 일주일 이내면 지난 시간( x분전, x일전 등 ) 아니면 날짜로 반환
+ * 날짜값을 현재 시간 기준으로 지난 시간으로 반환 ( 미래 )
  * @param value number | Date
- * @param format 포멧 형식 + 구분자형태로 입력 ex) "YYYY-MM-DD-hh-mm-ss"
- * @returns string형식으로 포멧 or 지난 시간으로 반환
+ * @returns 지난 시간을 초/분/시/일/개월 단위로 나눠서 string형태로 반환
  */
-export const dateOrTimeFormat = (value: number | Date, format = 'YYYY-MM-DD-hh-mm-ss') => {
-  // 일주일 이후
-  if (Date.now() - new Date(value).getTime() > 1000 * 60 * 60 * 24 * 7)
-    return dateFormat(value, format);
-  else return timeFormat(value);
-};
+export const futureTimeFormat = (value: Date | number) => {
+  const date = new Date(value);
 
-/**
- * 플레이 시간 변환기 ( 90초 -> 01:30 )
- * @param duration 현재 플레이 시간
- * @returns 포멧된 플레이 시간
- */
-export const playTimeConverter = (duration: string | number): string => {
-  if (+duration >= 60) {
-    return `${Math.floor(+duration / 60)} : ${+duration % 60}`;
+  const temp = date.getTime() - new Date().getTime();
+
+  // 1분이하
+  if (temp / 1000 < 60) {
+    return `${Math.floor(temp / 1000)}초`;
   }
-  return `0:${+duration % 60}`;
+  // 1시간이하
+  if (temp / 1000 / 60 < 60) {
+    return `${Math.floor(temp / 1000 / 60)}분`;
+  }
+  // 1일이하
+  if (temp / 1000 / 60 / 60 < 24) {
+    return `${Math.floor(temp / 1000 / 60 / 60)}시간`;
+  }
+  // 1월이하
+  if (temp / 1000 / 60 / 60 / 24 < 30) {
+    return `${Math.floor(temp / 1000 / 60 / 60 / 24)}일`;
+  }
+  // 1년이하
+  if (temp / 1000 / 60 / 60 / 24 / 30 < 12) {
+    return `${Math.floor(temp / 1000 / 60 / 60 / 24 / 30)}개월`;
+  }
+  // 1년 이상
+  return `${Math.floor(temp / 1000 / 60 / 60 / 24 / 30 / 12)}년`;
 };
 
 type Time = 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second';
@@ -281,4 +240,71 @@ const secondFormat = (date: Date, format: string) => {
 
   // "s"일 때 ( 6 )
   return second;
+};
+
+/**
+ * 날짜값을 정해진 포멧 형식으로 변환
+ * @param value number | Date
+ * @param format 포멧 형식 + 구분자형태로 입력 ex) "YYYY-MM-DD-hh-mm-ss"
+ * @param separator 전체적으로 적용할 구분자
+ * @returns string형식으로 포멧해서 반환
+ */
+export const dateFormat = (
+  value: Date | number,
+  format = 'YYYY-MM-DD-hh-mm-ss',
+  separator?: string,
+) => {
+  const date = new Date(value);
+
+  const dateArray: (number | string | undefined)[] = [];
+  let result = '';
+  /** 구분자만 추출 ( YYYY년MM월DD일 ---> ["년", "월", "일"] ) */
+  const separatorList = format.match(/[^YMDhms]/g);
+  let separatorIndex = 0;
+
+  dateArray.push(yearFormat(date, format));
+  dateArray.push(monthFormat(date, format));
+  dateArray.push(dayFormat(date, format));
+  dateArray.push(hourFormat(date, format));
+  dateArray.push(minuteFormat(date, format));
+  dateArray.push(secondFormat(date, format));
+
+  dateArray.forEach(v => {
+    // undefined일 경우 즉, 포멧하지 않거나 잘못된 입력인 경우 제외
+    if (!v) return;
+
+    // 구분자를 정해줬다면
+    if (separator) return (result += `${v}${separator}`);
+    else {
+      let targetSeparator = '';
+
+      if (!separatorList) separator = '';
+      else targetSeparator = separatorList[separatorIndex] || '';
+
+      separatorIndex++;
+
+      result += `${v}${targetSeparator}`;
+    }
+  });
+
+  return result;
+};
+
+/**
+ * 일주일 이내면 지난 시간( x분전, x일전 등 ) 아니면 날짜로 반환
+ * @param value number | string | Date
+ * @param format 포멧 형식 + 구분자형태로 입력 ex) "YYYY-MM-DD-hh-mm-ss"
+ * @returns string형식으로 포멧 or 지난 시간으로 반환
+ */
+export const dateOrTimeFormat = (value: number | string | Date, format = 'YYYY-MM-DD-hh-mm-ss') => {
+  const date = new Date(value);
+
+  // 일주일 이후
+  if (Date.now() - date.getTime() > 1000 * 60 * 60 * 24 * 7) {
+    return dateFormat(date, format);
+  }
+  // 일주일 이전
+  else {
+    return pastTimeFormat(date);
+  }
 };
