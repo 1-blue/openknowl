@@ -20,7 +20,8 @@ const StyledInput = styled.fieldset`
     font-size: ${({ theme }) => theme.fontSize.xs};
     color: ${({ theme }) => theme.colors.red500};
   }
-  & .input {
+  & .input,
+  .input-replacement {
     padding: 0.4em 0.8em;
 
     border: 0;
@@ -53,6 +54,12 @@ const StyledInput = styled.fieldset`
   }
   & .input-error {
     color: ${({ theme }) => theme.colors.red500};
+  }
+
+  & .input-replacement {
+    height: 120px;
+
+    font-size: 1rem;
   }
 `;
 

@@ -223,17 +223,17 @@ const colors = {
   rose800: '#9f1239',
   rose900: '#881337',
 
-  // indigo
-  main50: '#eef2ff',
-  main100: '#e0e7ff',
-  main200: '#c7d2fe',
-  main300: '#a5b4fc',
-  main400: '#818cf8',
-  main500: '#6366f1',
-  main600: '#4f46e5',
-  main700: '#4338ca',
-  main800: '#3730a3',
-  main900: '#312e81',
+  // blue
+  main50: '#eff6ff',
+  main100: '#dbeafe',
+  main200: '#bfdbfe',
+  main300: '#93c5fd',
+  main400: '#60a5fa',
+  main500: '#3b82f6',
+  main600: '#2563eb',
+  main700: '#1d4ed8',
+  main800: '#1e40af',
+  main900: '#1e3a8a',
 
   // common
   bg: '#F5F4F4',
@@ -338,6 +338,14 @@ const animation = {
     50% {
       transform: translateY(25%);
       animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  `,
+  spinY: keyframes`
+    0% {
+      transform: rotateY(0deg)
+    }
+    100% {
+      transform: rotateY(360deg)
     }
   `,
 };

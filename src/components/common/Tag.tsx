@@ -33,6 +33,7 @@ const StyledTag = styled.section`
   }
   & .tag-container {
     display: flex;
+    flex-flow: row wrap;
     gap: 0.4em;
     margin-top: 0.6em;
   }

@@ -34,7 +34,7 @@ const handler = async (
   }
   // 보드 생성
   else if (method === 'POST') {
-    const { name, date, category, platform, tags } = req.body;
+    const { name, date, category, platform, tags, pdf } = req.body;
 
     const count = await prisma.board.count({ where: { category: { category } } });
 
@@ -51,6 +51,7 @@ const handler = async (
             create: { tag },
           })),
         },
+        pdf,
       },
       include: {
         tags: true,

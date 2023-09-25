@@ -2,7 +2,8 @@ import styled from 'styled-components';
 
 const StyledModal = styled.div`
   width: 50vw;
-  min-width: 120px;
+  max-width: 1020px;
+  min-width: 480px;
 
   overflow-y: auto;
 

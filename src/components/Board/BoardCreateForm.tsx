@@ -5,16 +5,18 @@ import { IoCloseCircle } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { mutate } from 'swr';
 
-import { apiCreateBoard } from '@/apis';
+import { apiCreateBoard, apiUploadPDF } from '@/apis';
 import useFetchCategories from '@/hooks/useFetchCategoriesOfBoard';
 import useFetchPlatforms from '@/hooks/useFetchPlatformsOfBoard';
 
 import { useAppDispatch, useAppSelector } from '@/store';
 import { closeBoardModal } from '@/store/slices/boardModal';
+import { startSpinner, stopSpinner } from '@/store/slices/spinner';
 
 import Input from '@/components/common/Input';
 import Combobox from '@/components/common/Combobox';
 import Tag from '@/components/common/Tag';
+import FileInput from '@/components/common/FileInput';
 
 import type { Board } from '@prisma/client';
 
@@ -55,6 +57,18 @@ const StyledBoardCreateFormWrapper = styled.article`
       margin-top: 1em;
     }
 
+    & > .board-form-pdf-tag-conatiner {
+      display: flex;
+
+      & > * {
+        flex: 1;
+        width: 0;
+      }
+      & > * + * {
+        margin-left: 2em;
+      }
+    }
+
     & > .board-form-button-wrapper {
       text-align: end;
 
@@ -91,12 +105,14 @@ const StyledBoardCreateFormWrapper = styled.article`
   }
 `;
 
-interface BoardCreateForm extends Pick<Board, 'name' | 'date'> {}
+interface BoardCreateForm extends Pick<Board, 'name' | 'date'> {
+  files?: File[];
+}
 
 /** 2023/09/20 - Modal BoardCreateForm Component - by 1-blue */
 const BoardCreateForm: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { category: defaultCategoty } = useAppSelector(state => state.boardModal);
+  const { category: defaultCategoty, file } = useAppSelector(state => state.boardModal);
 
   const { categories } = useFetchCategories();
   const { platforms } = useFetchPlatforms();
@@ -106,10 +122,12 @@ const BoardCreateForm: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<BoardCreateForm>();
+    watch,
+    setValue,
+  } = useForm<BoardCreateForm>({ defaultValues: { files: [file] } });
 
   // category
-  const [category, setCategory] = useState(categories?.[0].category || defaultCategoty);
+  const [category, setCategory] = useState(defaultCategoty || categories?.[0].category || '신규');
   // platform
   const [platform, setPlatform] = useState(platforms?.[0].platform || '미니인턴');
   // tags
@@ -129,22 +147,44 @@ const BoardCreateForm: React.FC = () => {
   };
 
   /** 2023/09/21 - 보드 생성 요청 핸들러 - by 1-blue */
-  const createBoard: React.FormEventHandler = handleSubmit(({ name, date }) => {
+  const createBoard: React.FormEventHandler = handleSubmit(async ({ name, date, files }) => {
+    let pdfURL: string | null = null;
+
+    // 1. 이미지 업로드
+    if (files?.[0]) {
+      dispatch(startSpinner());
+
+      const result = await apiUploadPDF(files[0]);
+
+      if (result?.pdfURL) {
+        pdfURL = result.pdfURL;
+      }
+    }
+
+    // 2. 보드 생성
     apiCreateBoard({
       name,
       date,
       category,
       platform,
       tags,
+      pdf: pdfURL,
     })
       .then(({ message }) => {
         toast.success(message);
-
         mutate('/board');
+
+        dispatch(stopSpinner());
+        dispatch(closeBoardModal());
       })
       // FIXME:
       .catch(console.error);
   });
+
+  const currentFiles = watch('files');
+  const resetFile = () => {
+    setValue('files', undefined);
+  };
 
   return (
     <StyledBoardCreateFormWrapper>
@@ -162,20 +202,20 @@ const BoardCreateForm: React.FC = () => {
           placeholder="ex) 김인턴"
           required
           error={errors.name?.message}
+          defaultValue={process.env['NODE_ENV'] === 'development' ? '테스트' : ''}
           {...register('name', {
             required: { value: true, message: '이름을 입력해주세요!' },
             minLength: { value: 2, message: '최소 2자를 입력해주세요!' },
             maxLength: { value: 12, message: '최대 12자를 입력해주세요!' },
           })}
         />
-
         {categories && (
           <Combobox
             id="카테고리"
             required
             defaultValue={{
-              value: defaultCategoty,
-              label: defaultCategoty,
+              value: defaultCategoty || categories?.[0].category || '신규',
+              label: defaultCategoty || categories?.[0].category || '신규',
             }}
             options={categories.map(({ category }) => ({
               label: category,
@@ -196,8 +236,8 @@ const BoardCreateForm: React.FC = () => {
             required
             defaultValue={[
               {
-                label: platforms?.[0].platform,
-                value: platforms?.[0].platform,
+                label: platforms?.[0].platform || '미니인턴',
+                value: platforms?.[0].platform || '미니인턴',
               },
             ]}
             options={platforms.map(({ platform }) => ({
@@ -217,14 +257,32 @@ const BoardCreateForm: React.FC = () => {
           type="datetime-local"
           id="마감일"
           required
-          defaultValue={Date.now()}
+          defaultValue={new Date(Date.now() + 1000 * 60 * 60 * 9).toISOString().substring(0, 16)}
           error={errors.date?.message}
           {...register('date', {
             required: { value: true, message: '마감일을 입력해주세요!' },
           })}
         />
 
-        <Tag id="태그" tags={tags} createTag={createTag} removeTag={removeTag} />
+        <div className="board-form-pdf-tag-conatiner">
+          <Tag id="태그" tags={tags} createTag={createTag} removeTag={removeTag} />
+
+          <FileInput
+            {...register('files')}
+            type="file"
+            id="PDF"
+            hidden
+            replacementName={currentFiles?.[0]?.name}
+            resetFile={resetFile}
+            onChange={e => {
+              if (e.target.files?.[0]?.type === 'application/pdf') {
+                return register('files').onChange(e);
+              }
+
+              return toast.error('PDF 형식만 업로드 가능합니다.');
+            }}
+          />
+        </div>
 
         <div className="board-form-button-wrapper">
           <button

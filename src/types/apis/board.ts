@@ -20,7 +20,7 @@ export interface ApiFindAllBoardsRequest {}
 export interface ApiFindAllBoardsResponse extends ApiResponse<BoardWithETC[][]> {}
 
 /** 2023/09/18 - 특정 보드 생성 요청 타입 - by 1-blue */
-export interface ApiCreateBoardRequest extends Pick<Board, 'name' | 'date'> {
+export interface ApiCreateBoardRequest extends Pick<Board, 'name' | 'date' | 'pdf'> {
   category: string;
   platform: string;
   tags: string[];
@@ -29,7 +29,7 @@ export interface ApiCreateBoardRequest extends Pick<Board, 'name' | 'date'> {
 export interface ApiCreateBoardResponse extends ApiResponse<Board> {}
 
 /** 2023/09/18 - 특정 보드 수정 요청 타입 - by 1-blue */
-export interface ApiUpdateBoardRequest extends Pick<Board, 'name' | 'date'> {
+export interface ApiUpdateBoardRequest extends Pick<Board, 'name' | 'date' | 'pdf'> {
   idx: number;
   category: string;
   platform: string;

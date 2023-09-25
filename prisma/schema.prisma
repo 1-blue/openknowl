@@ -14,6 +14,7 @@ model Board {
   name String
   date DateTime
   order Int
+  pdf String?
 
   category Category @relation(fields: [categoryIdx], references: [idx], onUpdate: Cascade, onDelete: Cascade)
   categoryIdx Int

@@ -1,5 +1,6 @@
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Head from 'next/head';
 
 import GeneralLayout from '@/layouts/GeneralLayout';
 import MyReduxProvider from '@/providers/MyReduxProvider';
@@ -16,6 +17,10 @@ const App = ({ Component, pageProps }: AppProps) => {
       <MySWRProvider fallback={fallback || {}}>
         <MyStyledProvider>
           <GeneralLayout>
+            <Head>
+              <title>Openknowl</title>
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+            </Head>
             <Component {...pageProps} />
 
             <ToastContainer autoClose={2000} position="top-center" />
