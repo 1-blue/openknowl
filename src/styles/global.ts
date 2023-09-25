@@ -22,6 +22,17 @@ export const GlobalStyle = createGlobalStyle`
     cursor: pointer;
   }
 
+  a {
+    text-decoration: none;
+    background-color: transparent;
+    border: 0px solid transparent;
+    cursor: pointer;
+
+    &:visited {
+      color: #000;
+    }
+  }
+
   @media ${({ theme }) => theme.mediaSize.md} {
     html {
       font-size: 14px;

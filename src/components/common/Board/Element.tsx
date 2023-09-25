@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { mutate } from 'swr';
 import { Draggable } from 'react-beautiful-dnd';
-import { IoEllipsisVerticalSharp, IoTimeOutline } from 'react-icons/io5';
+import { IoEllipsisVerticalSharp, IoTimeOutline, IoAttach } from 'react-icons/io5';
 import styled, { css } from 'styled-components';
 import { toast } from 'react-toastify';
 
@@ -93,28 +93,39 @@ const StyledElement = styled.li<{ $isDragging: boolean }>`
   }
   & > .board-bottom-container {
     display: flex;
-    align-items: center;
+    justify-content: space-between;
 
-    & > .board-clock {
-      width: 16px;
-      height: 16px;
-      margin-right: 0.4em;
+    & > .board-bottom-wrapper {
+      display: flex;
+      align-items: center;
 
-      color: ${({ theme }) => theme.colors.gray400};
+      & > .board-clock-icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 0.4em;
+
+        color: ${({ theme }) => theme.colors.gray400};
+      }
+      & > .board-date {
+        display: block;
+
+        font-size: ${({ theme }) => theme.fontSize.xs};
+        font-weight: 600;
+        color: ${({ theme }) => theme.colors.gray400};
+      }
     }
-    & > .board-date {
-      display: block;
+    & > .board-clip-icon {
+      width: 20px;
+      height: 20px;
 
-      font-size: ${({ theme }) => theme.fontSize.xs};
-      font-weight: 600;
-      color: ${({ theme }) => theme.colors.gray400};
+      color: ${({ theme }) => theme.colors.main400};
     }
   }
 `;
 
 interface ElementProps
   extends Omit<DraggableProps, 'children'>,
-    Pick<BoardWithETC, 'idx' | 'name' | 'date' | 'category' | 'platform' | 'tags'> {
+    Pick<BoardWithETC, 'idx' | 'name' | 'date' | 'category' | 'platform' | 'tags' | 'pdf'> {
   index: number;
 }
 
@@ -125,6 +136,7 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
   date,
   platform,
   tags,
+  pdf,
   children,
   ...restProps
 }) => {
@@ -199,14 +211,18 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
             ))}
           </ul>
           <div className="board-bottom-container">
-            <IoTimeOutline className="board-clock" />
-            <time className="board-date">
-              {dateFormat(new Date(date), 'YYYY.MM.DD')} (+{futureTimeFormat(date)})
-            </time>
+            <div className="board-bottom-wrapper">
+              <IoTimeOutline className="board-clock-icon" />
+              <time className="board-date">
+                {dateFormat(new Date(date), 'YYYY.MM.DD')} (+{futureTimeFormat(date)})
+              </time>
+            </div>
+
+            {pdf && <IoAttach className="board-clip-icon" />}
           </div>
           {isShowDialog && (
             <div onClick={onBubblingDialog} style={{ margin: 0 }}>
-              <BoardDialog onClose={onCloseDialog} />
+              <BoardDialog onClose={onCloseDialog} pdfURL={pdf} />
             </div>
           )}
         </StyledElement>

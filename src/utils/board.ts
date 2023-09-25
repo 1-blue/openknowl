@@ -11,3 +11,8 @@ export const boardCategoryColorTable: { [key: string]: string } = {
 
 export const categories = ['신규', '검토', '1차면접', '2차면접', '서류합격', '최종합격', '불합격'];
 export const platforms = ['미니인턴', '원티드', '사람인', '로켓펀치', '잡코리아'];
+
+/** 2023/09/25 - PDF 경로에서 파일 이름만 가져오는 함수 - by 1-blue */
+export const getPDFName = (pdfURL: string) => {
+  return pdfURL.slice(pdfURL.lastIndexOf('/') + 1);
+};
