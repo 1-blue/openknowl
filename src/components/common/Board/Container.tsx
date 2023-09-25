@@ -4,7 +4,7 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 
 import { apiMoveBoard } from '@/apis';
 import { useAppDispatch } from '@/store';
-import { openBoardFormModal } from '@/store/slices/boardFormModal';
+import { openBoardForm } from '@/store/slices/board';
 
 const StyledContainer = styled.article`
   display: inline-flex;
@@ -28,7 +28,7 @@ const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     if (!category) return;
 
-    dispatch(openBoardFormModal({ category }));
+    dispatch(openBoardForm({ category }));
   };
 
   /** 2023/09/19 - `<Draggable>`이 `<Droppable>`로 드래그 되었을 때 실행되는 이벤트 - by 1-blue */

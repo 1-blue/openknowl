@@ -10,7 +10,7 @@ import useFetchCategories from '@/hooks/useFetchCategoriesOfBoard';
 import useFetchPlatforms from '@/hooks/useFetchPlatformsOfBoard';
 
 import { useAppDispatch, useAppSelector } from '@/store';
-import { closeBoardFormModal } from '@/store/slices/boardFormModal';
+import { closeBoardForm } from '@/store/slices/board';
 import { startSpinner, stopSpinner } from '@/store/slices/spinner';
 
 import Input from '@/components/common/Input';
@@ -112,7 +112,7 @@ interface BoardCreateForm extends Pick<Board, 'name' | 'date'> {
 /** 2023/09/20 - Modal BoardCreateForm Component - by 1-blue */
 const BoardCreateForm: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { category: defaultCategoty, file } = useAppSelector(state => state.boardFormModal);
+  const { category: defaultCategoty, file } = useAppSelector(state => state.board);
 
   const { categories } = useFetchCategories();
   const { platforms } = useFetchPlatforms();
@@ -175,7 +175,7 @@ const BoardCreateForm: React.FC = () => {
         mutate('/board');
 
         dispatch(stopSpinner());
-        dispatch(closeBoardFormModal());
+        dispatch(closeBoardForm());
       })
       .catch(console.error);
   });
@@ -189,7 +189,7 @@ const BoardCreateForm: React.FC = () => {
     <StyledBoardCreateFormWrapper>
       <IoCloseCircle
         className="board-form-close-button"
-        onClick={() => dispatch(closeBoardFormModal())}
+        onClick={() => dispatch(closeBoardForm())}
       />
 
       <h6 className="board-form-title">보드 생성</h6>
@@ -287,7 +287,7 @@ const BoardCreateForm: React.FC = () => {
           <button
             type="button"
             className="board-form-cancel-button"
-            onClick={() => dispatch(closeBoardFormModal())}
+            onClick={() => dispatch(closeBoardForm())}
           >
             취소
           </button>

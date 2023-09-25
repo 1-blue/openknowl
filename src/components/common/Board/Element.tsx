@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import { apiDeleteBoard } from '@/apis';
 
 import { useAppDispatch } from '@/store';
-import { openBoardFormModal } from '@/store/slices/boardFormModal';
+import { openBoardForm } from '@/store/slices/board';
 
 import { dateFormat, futureTimeFormat } from '@/utils/time';
 
@@ -167,7 +167,7 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
 
     // 수정
     if (type === 'update') {
-      dispatch(openBoardFormModal({ idx }));
+      dispatch(openBoardForm({ idx }));
     }
     // 삭제
     if (type === 'delete') {

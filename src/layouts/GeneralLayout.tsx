@@ -17,7 +17,7 @@ const StyledGeneralLayout = styled.div``;
 /** 2023/09/18 - 일반 레이아웃 component - by 1-blue */
 const GeneralLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { isStartSpinner } = useAppSelector(state => state.spinner);
-  const { isShowBoardFormModal, targetIdx } = useAppSelector(state => state.boardFormModal);
+  const { isShowBoardForm, targetIdx } = useAppSelector(state => state.board);
 
   return (
     <StyledGeneralLayout>
@@ -27,7 +27,7 @@ const GeneralLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <Footer />
 
       {/* 보드 생성 & 수정 모달 */}
-      {isShowBoardFormModal && (
+      {isShowBoardForm && (
         <Overlay>
           <Modal>{targetIdx !== -1 ? <BoardUpdateForm /> : <BoardCreateForm />}</Modal>
         </Overlay>

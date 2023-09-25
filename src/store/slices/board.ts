@@ -1,28 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-export interface BoardFormModalState {
-  isShowBoardFormModal: boolean;
+export interface BoardState {
+  isShowBoardForm: boolean;
   targetIdx: number;
   category: string;
   file?: File;
 }
 
-const initialState: BoardFormModalState = {
-  isShowBoardFormModal: false,
+const initialState: BoardState = {
+  isShowBoardForm: false,
   targetIdx: -1,
   category: '',
 };
 
-export const boardFormModalSlice = createSlice({
-  name: 'boardFormModal',
+export const boardSlice = createSlice({
+  name: 'board',
   initialState,
   reducers: {
-    openBoardFormModal: (
+    openBoardForm: (
       state,
       action: PayloadAction<{ idx?: number; category?: string; file?: File }>,
     ) => {
-      state.isShowBoardFormModal = true;
+      state.isShowBoardForm = true;
       if (action.payload.idx) {
         state.targetIdx = action.payload.idx;
       }
@@ -33,15 +33,18 @@ export const boardFormModalSlice = createSlice({
         state.file = action.payload.file;
       }
     },
-    closeBoardFormModal: state => {
-      state.isShowBoardFormModal = false;
+    closeBoardForm: state => {
+      state.isShowBoardForm = false;
       state.targetIdx = -1;
       state.category = '';
       state.file = undefined;
     },
+    openBoardDetail: () => {},
+    closeBoardDetail: () => {},
   },
 });
 
-export const { openBoardFormModal, closeBoardFormModal } = boardFormModalSlice.actions;
+export const { openBoardForm, closeBoardForm, openBoardDetail, closeBoardDetail } =
+  boardSlice.actions;
 
-export default boardFormModalSlice.reducer;
+export default boardSlice.reducer;

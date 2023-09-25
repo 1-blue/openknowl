@@ -1,13 +1,13 @@
 import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 
-import boardFormModal from '@/store/slices/boardFormModal';
+import board from '@/store/slices/board';
 import spinner from '@/store/slices/spinner';
 
 /** 2023/09/18 - `redux`의 `store` - by 1-blue */
 export const store = configureStore({
   reducer: {
-    boardFormModal,
+    board,
     spinner,
   },
   middleware(getDefaultMiddleware) {
