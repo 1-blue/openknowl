@@ -111,7 +111,7 @@ const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
       <label htmlFor={id} className="input-label">
         {id}
       </label>
-      <input type="text" onKeyDown={onCreateTag} className="tag-input" />
+      <input type="text" onKeyDown={onCreateTag} className="tag-input" placeholder="ex) 미니인턴" />
       <ul className="tag-container" onClick={onDeleteTagByBubbling}>
         {tags.map(tag => (
           <li key={tag} className="tag" role="button" data-tag={tag}>

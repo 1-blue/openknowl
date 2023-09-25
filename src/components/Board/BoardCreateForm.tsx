@@ -174,6 +174,7 @@ const BoardCreateForm: React.FC = () => {
     })
       .then(({ message }) => {
         toast.success(message);
+        // TODO:
         mutate('/board');
 
         dispatch(stopSpinner());
@@ -188,7 +189,7 @@ const BoardCreateForm: React.FC = () => {
   };
 
   const onClose = () => {
-    if (!confirm('폼을 닫으면 내용이 모두 지워집니다.')) return;
+    if (!confirm('폼을 닫으면 작성하신 내용이 모두 지워집니다.')) return;
 
     dispatch(closeBoardForm());
   };

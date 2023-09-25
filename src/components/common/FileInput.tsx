@@ -69,6 +69,10 @@ const StyledFileInput = styled.fieldset`
     font-size: 1rem;
 
     cursor: pointer;
+
+    &::placeholder {
+      font-size: ${({ theme }) => theme.fontSize.xs};
+    }
   }
 
   & .file-delete-container {
