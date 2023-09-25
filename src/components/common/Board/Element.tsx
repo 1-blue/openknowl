@@ -10,7 +10,7 @@ import { apiDeleteBoard } from '@/apis';
 import { useAppDispatch } from '@/store';
 import { openBoardForm } from '@/store/slices/board';
 
-import { dateFormat, futureTimeFormat } from '@/utils/time';
+import { dateFormat, futureTimeFormat, pastTimeFormat } from '@/utils/time';
 
 import BoardDialog from '@/components/Board/BoardDialog';
 
@@ -215,7 +215,11 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
             <div className="board-bottom-wrapper">
               <IoTimeOutline className="board-clock-icon" />
               <time className="board-date">
-                {dateFormat(new Date(date), 'YYYY.MM.DD')} (+{futureTimeFormat(date)})
+                {dateFormat(date, 'YYYY.MM.DD')} ({' '}
+                {Date.now() - new Date(date).getTime() > 0
+                  ? `-${pastTimeFormat(date)}`
+                  : `+${futureTimeFormat(date)}`}
+                )
               </time>
             </div>
 

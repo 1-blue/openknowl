@@ -8,7 +8,7 @@ import useFetchBoard from '@/hooks/useFetchBoard';
 import useOuterClick from '@/hooks/useOuterClick';
 
 import { getPDFName } from '@/utils/board';
-import { futureTimeFormat } from '@/utils/time';
+import { futureTimeFormat, pastTimeFormat } from '@/utils/time';
 
 import Custom500 from '@/pages/500';
 
@@ -156,7 +156,11 @@ const BoardDetail: React.FC = () => {
       </li>
       <li className="board-detail-list">
         <span className="board-detail-list-left">남은 기간</span>
-        <time className="board-detail-list-right">{futureTimeFormat(board.date)}</time>
+        <time className="board-detail-list-right">
+          {Date.now() - new Date(board.date).getTime() > 0
+            ? `${pastTimeFormat(board.date)}전`
+            : `${futureTimeFormat(board.date)} 초과`}
+        </time>
       </li>
       <li className="board-detail-list">
         <span className="board-detail-list-left">태그들</span>
