@@ -6,12 +6,16 @@ export interface BoardState {
   targetIdx: number;
   category: string;
   file?: File;
+
+  isShowBoardDetail: boolean;
 }
 
 const initialState: BoardState = {
   isShowBoardForm: false,
   targetIdx: -1,
   category: '',
+
+  isShowBoardDetail: false,
 };
 
 export const boardSlice = createSlice({
@@ -39,8 +43,15 @@ export const boardSlice = createSlice({
       state.category = '';
       state.file = undefined;
     },
-    openBoardDetail: () => {},
-    closeBoardDetail: () => {},
+
+    openBoardDetail: (state, action: PayloadAction<{ targetIdx: number }>) => {
+      state.isShowBoardDetail = true;
+      state.targetIdx = action.payload.targetIdx;
+    },
+    closeBoardDetail: state => {
+      state.isShowBoardDetail = false;
+      state.targetIdx = -1;
+    },
   },
 });
 

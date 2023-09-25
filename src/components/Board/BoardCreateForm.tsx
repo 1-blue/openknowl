@@ -188,6 +188,7 @@ const BoardCreateForm: React.FC = () => {
   return (
     <StyledBoardCreateFormWrapper>
       <IoCloseCircle
+        role="button"
         className="board-form-close-button"
         onClick={() => dispatch(closeBoardForm())}
       />

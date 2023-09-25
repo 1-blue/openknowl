@@ -11,13 +11,14 @@ import Spinner from '@/components/common/Spinner';
 import Modal from '@/components/common/Modal';
 import BoardCreateForm from '@/components/Board/BoardCreateForm';
 import BoardUpdateForm from '@/components/Board/BoardUpdateForm';
+import BoardDetail from '@/components/Board/BoardDetail';
 
 const StyledGeneralLayout = styled.div``;
 
 /** 2023/09/18 - 일반 레이아웃 component - by 1-blue */
 const GeneralLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { isStartSpinner } = useAppSelector(state => state.spinner);
-  const { isShowBoardForm, targetIdx } = useAppSelector(state => state.board);
+  const { isShowBoardForm, targetIdx, isShowBoardDetail } = useAppSelector(state => state.board);
 
   return (
     <StyledGeneralLayout>
@@ -25,6 +26,15 @@ const GeneralLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <Nav />
       <Main>{children}</Main>
       <Footer />
+
+      {/* 보드 상세 모달 */}
+      {isShowBoardDetail && (
+        <Overlay>
+          <Modal>
+            <BoardDetail />
+          </Modal>
+        </Overlay>
+      )}
 
       {/* 보드 생성 & 수정 모달 */}
       {isShowBoardForm && (

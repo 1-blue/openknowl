@@ -190,6 +190,7 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           $isDragging={snapshot.isDragging}
+          data-target-idx={idx}
         >
           <div className="board-top-container">
             <div className="board-top-wrapper">

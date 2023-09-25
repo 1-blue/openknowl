@@ -4,7 +4,7 @@ import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 
 import { apiMoveBoard } from '@/apis';
 import { useAppDispatch } from '@/store';
-import { openBoardForm } from '@/store/slices/board';
+import { openBoardDetail, openBoardForm } from '@/store/slices/board';
 
 const StyledContainer = styled.article`
   display: inline-flex;
@@ -24,11 +24,14 @@ const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
   const onOpenModalByBubbling: React.MouseEventHandler<HTMLElement> = e => {
     if (!(e.target instanceof HTMLElement)) return;
 
-    const { category } = e.target.dataset;
+    const { category, targetIdx } = e.target.dataset;
 
-    if (!category) return;
-
-    dispatch(openBoardForm({ category }));
+    if (category) {
+      dispatch(openBoardForm({ category }));
+    }
+    if (targetIdx) {
+      dispatch(openBoardDetail({ targetIdx: +targetIdx }));
+    }
   };
 
   /** 2023/09/19 - `<Draggable>`이 `<Droppable>`로 드래그 되었을 때 실행되는 이벤트 - by 1-blue */
