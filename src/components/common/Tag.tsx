@@ -69,6 +69,7 @@ const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
   const onCreateTag: React.KeyboardEventHandler<HTMLInputElement> = e => {
     if (!(e.target instanceof HTMLInputElement)) return;
     if (e.key !== 'Enter') return;
+    if (e.nativeEvent.isComposing) return;
 
     e.stopPropagation();
     e.preventDefault();
@@ -90,9 +91,6 @@ const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
 
     // "#" 붙이기
     createTag('#' + e.target.value);
-
-    // FIXME: 한글 두 번 등록되는 문제 해결하기
-    // 앞에 # 붙이면 제거하기
 
     // 초기화
     e.target.value = '';

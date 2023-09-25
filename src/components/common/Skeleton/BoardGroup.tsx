@@ -48,7 +48,7 @@ const BoardGroup: React.FC = () => {
 
   return (
     <StyledBoardGroup>
-      {Array(5)
+      {Array(8)
         .fill(null)
         .map((_, i) => (
           <Square key={i} height="100%" className="skeleton-board-gruop">

@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import useFetchBoards from '@/hooks/useFetchBoards';
 
 import { useAppDispatch } from '@/store';
-import { openBoardModal } from '@/store/slices/boardModal';
+import { openBoardFormModal } from '@/store/slices/boardFormModal';
 
 import Custom500 from '@/pages/500';
 import Board from '@/components/common/Board';
@@ -20,7 +20,7 @@ const Home = () => {
       return toast.error('PDF만 업로드 가능합니다!');
     }
 
-    dispatch(openBoardModal({ file }));
+    dispatch(openBoardFormModal({ file }));
   };
 
   if (error) {

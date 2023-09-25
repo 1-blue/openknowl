@@ -2,8 +2,6 @@ import { Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import type { DroppableProps } from 'react-beautiful-dnd';
 
-import { useAppDispatch } from '@/store';
-import { openBoardModal } from '@/store/slices/boardModal';
 import { boardCategoryColorTable } from '@/utils/board';
 
 const StyledWrapper = styled.section<{ $category: string }>`
@@ -81,8 +79,6 @@ const Wrapper: React.FC<React.PropsWithChildren<WrapperProps>> = ({
   children,
   ...restProps
 }) => {
-  const dispatch = useAppDispatch();
-
   return (
     <StyledWrapper $category={category}>
       <form className="board-wrapper-top">
@@ -91,11 +87,7 @@ const Wrapper: React.FC<React.PropsWithChildren<WrapperProps>> = ({
           {category}
         </label>
 
-        <button
-          type="button"
-          className="board-append-button"
-          onClick={() => dispatch(openBoardModal({ category }))}
-        >
+        <button type="button" className="board-append-button" data-category={category}>
           + 보드 추가
         </button>
       </form>
