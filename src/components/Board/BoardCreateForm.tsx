@@ -6,8 +6,10 @@ import { toast } from 'react-toastify';
 import { mutate } from 'swr';
 
 import { apiCreateBoard, apiUploadPDF } from '@/apis';
+
 import useFetchCategories from '@/hooks/useFetchCategoriesOfBoard';
 import useFetchPlatforms from '@/hooks/useFetchPlatformsOfBoard';
+import useOuterClick from '@/hooks/useOuterClick';
 
 import { useAppDispatch, useAppSelector } from '@/store';
 import { closeBoardForm } from '@/store/slices/board';
@@ -185,13 +187,17 @@ const BoardCreateForm: React.FC = () => {
     setValue('files', undefined);
   };
 
+  const onClose = () => {
+    if (!confirm('폼을 닫으면 내용이 모두 지워집니다.')) return;
+
+    dispatch(closeBoardForm());
+  };
+
+  const formRef = useOuterClick(onClose);
+
   return (
-    <StyledBoardCreateFormWrapper>
-      <IoCloseCircle
-        role="button"
-        className="board-form-close-button"
-        onClick={() => dispatch(closeBoardForm())}
-      />
+    <StyledBoardCreateFormWrapper ref={formRef}>
+      <IoCloseCircle role="button" className="board-form-close-button" onClick={onClose} />
 
       <h6 className="board-form-title">보드 생성</h6>
 
@@ -285,11 +291,7 @@ const BoardCreateForm: React.FC = () => {
         </div>
 
         <div className="board-form-button-wrapper">
-          <button
-            type="button"
-            className="board-form-cancel-button"
-            onClick={() => dispatch(closeBoardForm())}
-          >
+          <button type="button" className="board-form-cancel-button" onClick={onClose}>
             취소
           </button>
           <button type="submit" className="board-form-excute-button">

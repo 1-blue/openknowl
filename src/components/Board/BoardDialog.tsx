@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
+
+import useOuterClick from '@/hooks/useOuterClick';
 
 import { getPDFName } from '@/utils/board';
 
@@ -43,24 +44,7 @@ interface BoardDialogProps {
 
 /** 2023/09/20 - Board Dialog - by 1-blue */
 const BoardDialog: React.FC<BoardDialogProps> = ({ onClose, pdfURL }) => {
-  const dialogRef = useRef<HTMLElement>(null);
-
-  /** 2023/09/20 - 외부 클릭 시 닫는 이벤트 핸들러 - by 1-blue */
-  const handleClose = (e: MouseEvent) => {
-    if (!dialogRef.current) return;
-    if (!(e.target instanceof HTMLElement)) return;
-    if (dialogRef.current.contains(e.target)) return;
-
-    onClose();
-  };
-
-  useEffect(() => {
-    window.addEventListener('click', handleClose);
-
-    return () => {
-      window.removeEventListener('click', handleClose);
-    };
-  }, []);
+  const dialogRef = useOuterClick(onClose);
 
   /** 2023/09/25 - PDF 다운로드 - by 1-blue */
   const handlePDFDownload = async () => {
