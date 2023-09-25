@@ -10,6 +10,8 @@ import useOuterClick from '@/hooks/useOuterClick';
 import { getPDFName } from '@/utils/board';
 import { futureTimeFormat, pastTimeFormat } from '@/utils/time';
 
+import Skeleton from '@/components/common/Skeleton';
+import Overlay from '@/components/common/Overlay';
 import Custom500 from '@/pages/500';
 
 const StyledBoardDetail = styled.ul`
@@ -136,7 +138,12 @@ const BoardDetail: React.FC = () => {
     return <Custom500 />;
   }
   // TODO:
-  if (isLoading) return <></>;
+  if (isLoading)
+    return (
+      <Overlay>
+        <Skeleton.BoardDetail />
+      </Overlay>
+    );
   if (!board) return <></>;
 
   return (

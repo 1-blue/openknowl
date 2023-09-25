@@ -9,7 +9,7 @@ const StyledOverlay = styled.aside`
   justify-content: center;
   align-items: center;
 
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.7);
 
   animation: ${({ theme }) => theme.animation.fadeIn} 0.6s ease-in-out;
 `;
