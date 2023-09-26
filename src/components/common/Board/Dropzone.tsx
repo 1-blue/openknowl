@@ -1,5 +1,6 @@
 import { Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
+import { IoCreate } from 'react-icons/io5';
 import type { DroppableProps } from 'react-beautiful-dnd';
 
 import { boardCategoryColorTable } from '@/utils/board';
@@ -7,6 +8,7 @@ import { boardCategoryColorTable } from '@/utils/board';
 const StyledDropzone = styled.section<{ $category: string }>`
   flex: 1;
   width: 240px;
+  height: 100%;
 
   padding: 1em;
 
@@ -35,24 +37,29 @@ const StyledDropzone = styled.section<{ $category: string }>`
 
       border-radius: 1em;
       font-size: ${({ theme }) => theme.fontSize.xs};
+      font-weight: bold;
 
       background-color: ${({ $category }) => boardCategoryColorTable[$category]};
     }
     & > .board-append-button {
+      width: 20px;
+      height: 20px;
       margin-left: auto;
-      padding: 0.4em 0.6em;
+      padding: 0.1em;
 
       font-weight: 700;
-      color: ${({ theme }) => theme.colors.main400};
-      border: 2px solid ${({ theme }) => theme.colors.main300};
-      border-radius: 0.6em;
+      font-size: ${({ theme }) => theme.fontSize.xs};
+      color: ${({ theme }) => theme.colors.gray500};
 
       transition: all 0.4s;
       cursor: pointer;
 
       &:hover {
         color: ${({ theme }) => theme.colors.main600};
-        border: 2px solid ${({ theme }) => theme.colors.main500};
+      }
+
+      & path {
+        pointer-events: none;
       }
     }
   }
@@ -87,9 +94,7 @@ const Dropzone: React.FC<React.PropsWithChildren<DropzoneProps>> = ({
           {category}
         </label>
 
-        <button type="button" className="board-append-button" data-category={category}>
-          + 보드 추가
-        </button>
+        <IoCreate role="button" className="board-append-button" data-category={category} />
       </form>
 
       <Droppable {...restProps}>

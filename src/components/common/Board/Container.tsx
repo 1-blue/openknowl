@@ -22,7 +22,7 @@ const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   /** 2023/09/25 - 보드 생성 모달 열기 이벤트 핸들러 ( 버블링 ) - by 1-blue */
   const onOpenModalByBubbling: React.MouseEventHandler<HTMLElement> = e => {
-    if (!(e.target instanceof HTMLElement)) return;
+    if (!(e.target instanceof SVGElement)) return;
 
     const { category, targetIdx } = e.target.dataset;
 
@@ -56,7 +56,12 @@ const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
     });
 
     // TODO:
-    mutate('/board', board => board, { revalidate: true });
+    // mutate('/board', board => board, { revalidate: true });
+    mutate(
+      key => typeof key === 'string' && key.startsWith('/board'),
+      board => board,
+      { revalidate: true },
+    );
   };
 
   return (
