@@ -9,11 +9,13 @@ import Custom500 from '@/pages/500';
 import Board from '@/components/common/Board';
 import Skeleton from '@/components/common/Skeleton';
 import Dropzone from '@/components/common/Dropzone';
+import useFetchCategories from '@/hooks/useFetchCategoriesOfBoard';
 
 /** 2023/09/18 - 메인 페이지 - by 1-blue */
 const Home = () => {
   const dispatch = useAppDispatch();
   const { boardsGroup, isLoading, error } = useFetchBoards();
+  const { categories } = useFetchCategories();
 
   const onDropExcute = (file: File) => {
     if (file.type !== 'application/pdf') {
@@ -26,7 +28,7 @@ const Home = () => {
   if (error) {
     return <Custom500 />;
   }
-  if (isLoading || !boardsGroup) {
+  if (isLoading || !boardsGroup || !categories) {
     return <Skeleton.BoardGroup />;
   }
 
@@ -38,14 +40,14 @@ const Home = () => {
         </h1>
 
         <Board.Container>
-          {boardsGroup.map(boards => (
-            <Board.Wrapper
-              key={boards[0].category.category}
-              droppableId={boards[0].category.category}
-              category={boards[0].category.category}
+          {boardsGroup.map((boards, index) => (
+            <Board.Dropzone
+              key={categories[index].category}
+              droppableId={categories[index].category}
+              category={categories[index].category}
             >
               {boards.map(({ idx, order, ...restProps }) => (
-                <Board.Element
+                <Board.Dragzone
                   key={idx}
                   draggableId={idx + ''}
                   index={order}
@@ -53,7 +55,7 @@ const Home = () => {
                   {...restProps}
                 />
               ))}
-            </Board.Wrapper>
+            </Board.Dropzone>
           ))}
         </Board.Container>
       </article>

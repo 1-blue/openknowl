@@ -17,7 +17,7 @@ import BoardDialog from '@/components/Board/BoardDialog';
 import type { DraggableProps } from 'react-beautiful-dnd';
 import type { BoardWithETC } from '@/types/apis';
 
-const StyledElement = styled.li<{ $isDragging: boolean }>`
+const StyledDragzone = styled.li<{ $isDragging: boolean }>`
   position: relative;
   padding: 0.8em 0.6em;
 
@@ -123,14 +123,14 @@ const StyledElement = styled.li<{ $isDragging: boolean }>`
   }
 `;
 
-interface ElementProps
+interface DragzoneProps
   extends Omit<DraggableProps, 'children'>,
     Pick<BoardWithETC, 'idx' | 'name' | 'date' | 'category' | 'platform' | 'tags' | 'pdf'> {
   index: number;
 }
 
 /** 2023/09/19 - 특정 보드 컴포넌트 ( 드래그 ) - by 1-blue */
-const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
+const Dragzone: React.FC<React.PropsWithChildren<DragzoneProps>> = ({
   idx,
   name,
   date,
@@ -185,7 +185,7 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
   return (
     <Draggable {...restProps}>
       {(provided, snapshot) => (
-        <StyledElement
+        <StyledDragzone
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
@@ -230,10 +230,10 @@ const Element: React.FC<React.PropsWithChildren<ElementProps>> = ({
               <BoardDialog onClose={onCloseDialog} pdfURL={pdf} />
             </div>
           )}
-        </StyledElement>
+        </StyledDragzone>
       )}
     </Draggable>
   );
 };
 
-export default Element;
+export default Dragzone;

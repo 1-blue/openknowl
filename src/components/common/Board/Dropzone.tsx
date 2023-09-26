@@ -4,7 +4,7 @@ import type { DroppableProps } from 'react-beautiful-dnd';
 
 import { boardCategoryColorTable } from '@/utils/board';
 
-const StyledWrapper = styled.section<{ $category: string }>`
+const StyledDropzone = styled.section<{ $category: string }>`
   flex: 1;
   width: 240px;
 
@@ -69,18 +69,18 @@ const StyledWrapper = styled.section<{ $category: string }>`
 `;
 
 //? children이 중복되어서 제외함
-interface WrapperProps extends Omit<DroppableProps, 'children'> {
+interface DropzoneProps extends Omit<DroppableProps, 'children'> {
   category: string;
 }
 
 /** 2023/09/19 - 보드들을 감싸는 래퍼 컴포넌트 ( 보드를 사용하기 위한 설정들 적용 ) - by 1-blue */
-const Wrapper: React.FC<React.PropsWithChildren<WrapperProps>> = ({
+const Dropzone: React.FC<React.PropsWithChildren<DropzoneProps>> = ({
   category,
   children,
   ...restProps
 }) => {
   return (
-    <StyledWrapper $category={category}>
+    <StyledDropzone $category={category}>
       <form className="board-wrapper-top">
         <input type="checkbox" id="board-wrapper-checkbox" />
         <label htmlFor="board-wrapper-checkbox" className="board-wrapper-checkbox-label">
@@ -104,8 +104,8 @@ const Wrapper: React.FC<React.PropsWithChildren<WrapperProps>> = ({
           </ul>
         )}
       </Droppable>
-    </StyledWrapper>
+    </StyledDropzone>
   );
 };
 
-export default Wrapper;
+export default Dropzone;
