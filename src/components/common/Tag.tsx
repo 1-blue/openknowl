@@ -70,7 +70,12 @@ const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
     if (!(e.target instanceof HTMLInputElement)) return;
     if (e.key !== 'Enter') return;
     if (e.nativeEvent.isComposing) return;
+    if (e.target.value.trim().length <= 0) {
+      e.stopPropagation();
+      e.preventDefault();
 
+      return toast.warning('공백을 제외한 글자를 입력해주세요!');
+    }
     e.stopPropagation();
     e.preventDefault();
 
@@ -90,7 +95,7 @@ const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
     }
 
     // "#" 붙이기
-    createTag('#' + e.target.value);
+    createTag('#' + e.target.value.trim());
 
     // 초기화
     e.target.value = '';

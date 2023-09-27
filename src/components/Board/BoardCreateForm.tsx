@@ -189,7 +189,7 @@ const BoardCreateForm: React.FC = () => {
   };
 
   const onClose = () => {
-    if (!confirm('폼을 닫으면 작성하신 내용이 모두 지워집니다.')) return;
+    if (!confirm('폼을 닫으면 작성하신 내용이 저장되지 않습니다.')) return;
 
     dispatch(closeBoardForm());
   };
@@ -204,6 +204,7 @@ const BoardCreateForm: React.FC = () => {
 
       <form onSubmit={createBoard} className="board-form">
         <Input
+          autoFocus
           type="text"
           id="이름"
           placeholder="ex) 김인턴"
