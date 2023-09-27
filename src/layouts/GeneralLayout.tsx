@@ -30,7 +30,7 @@ const GeneralLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       {/* 보드 상세 모달 */}
       {isShowBoardDetail && (
         <Overlay>
-          <Modal>
+          <Modal width="60vw" minWidth="240px" maxWidth="480px">
             <BoardDetail />
           </Modal>
         </Overlay>
@@ -39,7 +39,9 @@ const GeneralLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       {/* 보드 생성 & 수정 모달 */}
       {isShowBoardForm && (
         <Overlay>
-          <Modal>{targetIdx !== -1 ? <BoardUpdateForm /> : <BoardCreateForm />}</Modal>
+          <Modal width="60vw" minWidth="480px" maxWidth="768px">
+            {targetIdx !== -1 ? <BoardUpdateForm /> : <BoardCreateForm />}
+          </Modal>
         </Overlay>
       )}
 
