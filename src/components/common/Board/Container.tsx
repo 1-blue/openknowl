@@ -3,37 +3,31 @@ import styled from 'styled-components';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
 
 import { apiMoveBoard } from '@/apis';
-import { useAppDispatch } from '@/store';
-import { openBoardDetail, openBoardForm } from '@/store/slices/board';
 
 const StyledContainer = styled.article`
   display: inline-flex;
+  flex-flow: column nowrap;
 
-  padding: 1em 0.4em;
+  padding: 1em;
+
+  border: 2px solid ${({ theme }) => theme.colors.gray400};
+  border-radius: 0.2em;
 
   & > * + * {
-    margin-left: 1em;
+    margin-top: 1em;
+  }
+
+  & .board-container {
+    display: inline-flex;
+
+    & > * + * {
+      margin-left: 1em;
+    }
   }
 `;
 
 /** 2023/09/19 - 보드들의 래퍼 컴포넌트들을 감싸는 컨테이너 컴포넌트 - by 1-blue */
 const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const dispatch = useAppDispatch();
-
-  /** 2023/09/25 - 보드 생성 모달 열기 이벤트 핸들러 ( 버블링 ) - by 1-blue */
-  const onOpenModalByBubbling: React.MouseEventHandler<HTMLElement> = e => {
-    if (!(e.target instanceof SVGElement)) return;
-
-    const { category, targetIdx } = e.target.dataset;
-
-    if (category) {
-      dispatch(openBoardForm({ category }));
-    }
-    if (targetIdx) {
-      dispatch(openBoardDetail({ targetIdx: +targetIdx }));
-    }
-  };
-
   /** 2023/09/19 - `<Draggable>`이 `<Droppable>`로 드래그 되었을 때 실행되는 이벤트 - by 1-blue */
   const onDragEnd = async ({ source, destination, draggableId }: DropResult) => {
     // 정해지지 않은 공간에 드랍한 경우
@@ -65,8 +59,10 @@ const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
   };
 
   return (
-    <StyledContainer onClick={onOpenModalByBubbling}>
-      <DragDropContext onDragEnd={onDragEnd}>{children}</DragDropContext>
+    <StyledContainer>
+      <section className="board-container">
+        <DragDropContext onDragEnd={onDragEnd}>{children}</DragDropContext>
+      </section>
     </StyledContainer>
   );
 };

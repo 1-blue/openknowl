@@ -63,3 +63,8 @@ export interface ApiFindAllCategoriesOfBoardResponse extends ApiResponse<Categor
 export interface ApiFindAllPlatformsOfBoardRequest {}
 /** 2023/09/22 - 보드의 플랫폼 리스트 응답 타입 - by 1-blue */
 export interface ApiFindAllPlatformsOfBoardResponse extends ApiResponse<Platform[]> {}
+
+/** 2023/09/26 - 보드의 태그 리스트 요청 타입 - by 1-blue */
+export interface ApiFindAllTagsOfBoardRequest {}
+/** 2023/09/26 - 보드의 태그 리스트 응답 타입 - by 1-blue */
+export interface ApiFindAllTagsOfBoardResponse extends ApiResponse<Tag[]> {}

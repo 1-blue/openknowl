@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Select from 'react-select';
 import type { StateManagerProps } from 'react-select/dist/declarations/src/useStateManager';
+import type { SelectOption } from '@/types';
 
 const StyledComboboxWrapper = styled.fieldset`
   position: relative;
@@ -99,16 +100,16 @@ const StyledCombobox = styled(Select).attrs({
       color: #fff;
     }
   }
+  .react-select__placeholder {
+    color: ${({ theme }) => theme.colors.gray400};
+    font-size: ${({ theme }) => theme.fontSize.xs};
+  }
 `;
 
-interface Option {
-  value: string;
-  label: string;
-}
-interface ComboboxProps extends StateManagerProps<Option> {
+interface ComboboxProps extends StateManagerProps<SelectOption> {
   id: string;
-  required: boolean;
-  options: Option[];
+  required?: boolean;
+  options: SelectOption[];
 }
 
 /** 2023/09/21 - Combobox Component - by 1-blue */
