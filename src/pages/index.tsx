@@ -48,9 +48,6 @@ const Home = () => {
   if (error) {
     return <Custom500 />;
   }
-  if (isLoading || !boardsGroup || !categories) {
-    return <Skeleton.BoardGroup />;
-  }
 
   return (
     <article style={{ padding: '2em' }} onClick={onOpenModalByBubbling}>
@@ -61,25 +58,29 @@ const Home = () => {
       <Dropzone onDropExcute={onDropExcute}>
         <BoardFilter />
 
-        <Board.Container>
-          {boardsGroup.map((boards, index) => (
-            <Board.Dropzone
-              key={categories[index].category}
-              droppableId={categories[index].category}
-              category={categories[index].category}
-            >
-              {boards.map(({ idx, order, ...restProps }) => (
-                <Board.Dragzone
-                  key={idx}
-                  draggableId={idx + ''}
-                  index={order}
-                  idx={idx}
-                  {...restProps}
-                />
-              ))}
-            </Board.Dropzone>
-          ))}
-        </Board.Container>
+        {isLoading || !boardsGroup || !categories ? (
+          <Skeleton.BoardGroup />
+        ) : (
+          <Board.Container>
+            {boardsGroup.map((boards, index) => (
+              <Board.Dropzone
+                key={categories[index].category}
+                droppableId={categories[index].category}
+                category={categories[index].category}
+              >
+                {boards.map(({ idx, order, ...restProps }) => (
+                  <Board.Dragzone
+                    key={idx}
+                    draggableId={idx + ''}
+                    index={order}
+                    idx={idx}
+                    {...restProps}
+                  />
+                ))}
+              </Board.Dropzone>
+            ))}
+          </Board.Container>
+        )}
       </Dropzone>
     </article>
   );

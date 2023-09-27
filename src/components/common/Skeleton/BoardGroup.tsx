@@ -6,8 +6,10 @@ import { useEffect, useState } from 'react';
 const StyledBoardGroup = styled.section`
   display: inline-flex;
   height: 100vh;
+  padding: 1em;
 
-  padding: 1em 0.4em;
+  border: 2px solid ${({ theme }) => theme.colors.gray400};
+  border-radius: 0.2em;
 
   & > * + * {
     margin-left: 1em;

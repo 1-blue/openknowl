@@ -8,6 +8,7 @@ import useFetchPlatforms from '@/hooks/useFetchPlatformsOfBoard';
 import useFetchTagsOfBoard from '@/hooks/useFetchTagsOfBoard';
 
 import Combobox from '@/components/common/Combobox';
+import Skeleton from '@/components/common/Skeleton';
 
 import type { Props as ReactSelectProps } from 'react-select';
 import type { SelectOption } from '@/types';
@@ -35,8 +36,8 @@ const BoardFilter: React.FC = () => {
   const platform = searchParams.get('platform');
   const tag = searchParams.get('tag');
 
-  const { platforms } = useFetchPlatforms();
-  const { tags } = useFetchTagsOfBoard();
+  const { platforms, isLoading: platformsLoading } = useFetchPlatforms();
+  const { tags, isLoading: tagsLoading } = useFetchTagsOfBoard();
 
   /** 2023/09/27 - 플랫폼 필터링 - by 1-blue */
   const onSelectPlatform: ReactSelectProps<SelectOption>['onChange'] = selected => {
@@ -63,35 +64,34 @@ const BoardFilter: React.FC = () => {
     router.push(path);
   };
 
+  if (platformsLoading || !platforms || tagsLoading || !tags) {
+    return <Skeleton.BoardFilter />;
+  }
+
   return (
     <StyledBoardFilter>
-      {platforms && (
-        <Combobox
-          id="플랫폼 필터링"
-          defaultValue={[{ label: platform || '선택안함', value: platform || '선택안함' }]}
-          options={[{ idx: -1, platform: '선택안함' }, ...platforms].map(({ platform }) => ({
-            label: platform,
-            value: platform,
-          }))}
-          onChange={onSelectPlatform}
-          className="board-platform-filter"
-        />
-      )}
-
-      {tags && (
-        <Combobox
-          isMulti
-          id="태그 필터링"
-          defaultValue={tag?.split(',').map(tag => ({ label: tag, value: tag }))}
-          options={tags.map(({ tag }) => ({
-            label: tag,
-            value: tag,
-          }))}
-          onChange={onSelectTag}
-          className="board-tag-filter"
-          placeholder="태그들을 선택해주세요!"
-        />
-      )}
+      <Combobox
+        id="플랫폼 필터링"
+        defaultValue={[{ label: platform || '선택안함', value: platform || '선택안함' }]}
+        options={[{ idx: -1, platform: '선택안함' }, ...platforms].map(({ platform }) => ({
+          label: platform,
+          value: platform,
+        }))}
+        onChange={onSelectPlatform}
+        className="board-platform-filter"
+      />
+      <Combobox
+        isMulti
+        id="태그 필터링"
+        defaultValue={tag?.split(',').map(tag => ({ label: tag, value: tag }))}
+        options={tags.map(({ tag }) => ({
+          label: tag,
+          value: tag,
+        }))}
+        onChange={onSelectTag}
+        className="board-tag-filter"
+        placeholder="태그들을 선택해주세요!"
+      />
     </StyledBoardFilter>
   );
 };
