@@ -6,9 +6,53 @@ import type {
   ApiFindAllBoardsResponse,
   ApiUpdateBoardRequest,
 } from '@/types/apis';
+import type { Prisma } from '@prisma/client';
 import prisma from '@/prisma';
-import { Prisma } from '@prisma/client';
 
+/**
+ * @swagger
+ * /api/board:
+ *  get:
+ *    summary: 모든 보드들 요청
+ *    description: 모든 보드들 요청
+ *    parameters:
+ *      - in: query
+ *        name: 플랫폼
+ *        schema:
+ *          type: string
+ *        description: ex) 미니인턴 & 원티드 & 잡코리아 & 로켓펀치 & 사람인
+ *      - in: query
+ *        name: 태그
+ *        schema:
+ *          type: string
+ *        description: ex) \#연봉협상,\#면접,\#시니어,\#오픈놀,\#기업과제,\#태그
+ *    responses:
+ *      200:
+ *        description: 모든 보드들 응답
+ *  post:
+ *    summary: 보드 생성
+ *    description: 보드 생성
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            name: string
+ *            date: date
+ *            category: string
+ *            platform: string
+ *            tags: array
+ *            pdf: string
+ *          example:
+ *            name: Swagger 테스트
+ *            date: 2023-12-31T23:59
+ *            category: 검토
+ *            platform: 미니인턴
+ *            tags: ['#미니인턴', '#면접', '#기업과제']
+ *            pdf: https://bleplayground.s3.ap-northeast-2.amazonaws.com/test.pdf
+ *    responses:
+ *      201:
+ *        description: 보드 생성 완료
+ */
 const handler = async (
   req: Override<
     NextApiRequest,

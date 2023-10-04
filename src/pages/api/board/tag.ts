@@ -2,6 +2,16 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { ApiFindAllTagsOfBoardResponse } from '@/types/apis';
 import prisma from '@/prisma';
 
+/**
+ * @swagger
+ * /api/board/tag:
+ *  get:
+ *    summary: 등록된 모든 태그 요청
+ *    description: 등록된 모든 태그 요청
+ *    responses:
+ *      200:
+ *        description: 등록된 모든 태그 응답
+ */
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ApiFindAllTagsOfBoardResponse>,
