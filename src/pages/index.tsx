@@ -1,7 +1,10 @@
 import { toast } from 'react-toastify';
-import { useSearchParams } from 'next/navigation';
+import { useSWRConfig } from 'swr';
+
+import { apiMoveBoard } from '@/apis';
 
 import useFetchBoards from '@/hooks/useFetchBoards';
+import useFetchCategories from '@/hooks/useFetchCategoriesOfBoard';
 
 import { useAppDispatch } from '@/store';
 import { openBoardForm, openBoardDetail } from '@/store/slices/board';
@@ -10,19 +13,16 @@ import Custom500 from '@/pages/500';
 import Board from '@/components/common/Board';
 import Skeleton from '@/components/common/Skeleton';
 import Dropzone from '@/components/common/Dropzone';
-import useFetchCategories from '@/hooks/useFetchCategoriesOfBoard';
 import BoardFilter from '@/components/Board/BoardFilter';
 
 /** 2023/09/18 - 메인 페이지 - by 1-blue */
 const Home = () => {
-  const searchParams = useSearchParams();
-  const platform = searchParams.get('platform');
-  const tag = searchParams.get('tag');
-
+  const { mutate } = useSWRConfig();
   const dispatch = useAppDispatch();
-  const { boardsGroup, isLoading, error } = useFetchBoards({ platform, tag });
+  const { boardsGroup, isLoading, error, boardsMutate } = useFetchBoards();
   const { categories } = useFetchCategories();
 
+  /** 2023/10/04 - 드랍존에 드랍되었을 때 실행할 함수 - by 1-blue */
   const onDropExcute = (file: File) => {
     if (file.type !== 'application/pdf') {
       return toast.error('PDF만 업로드 가능합니다!');
@@ -45,6 +45,20 @@ const Home = () => {
     }
   };
 
+  /** 2023/10/04 - 보드 드래그 완료 후 실행할 함수 - by 1-blue */
+  const onDragEndExcute = ({
+    targetIdx,
+    category,
+    order,
+  }: {
+    targetIdx: number;
+    category: string;
+    order: number;
+  }) => {
+    boardsMutate({ idx: targetIdx, category, order });
+    apiMoveBoard({ idx: targetIdx, category, order }).then(() => mutate('/board'));
+  };
+
   if (error) {
     return <Custom500 />;
   }
@@ -61,7 +75,7 @@ const Home = () => {
         {isLoading || !boardsGroup || !categories ? (
           <Skeleton.BoardGroup />
         ) : (
-          <Board.Container>
+          <Board.Container onDragEndExcute={onDragEndExcute}>
             {boardsGroup.map((boards, index) => (
               <Board.Dropzone
                 key={categories[index].category}

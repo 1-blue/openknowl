@@ -1,8 +1,5 @@
-import { mutate } from 'swr';
 import styled from 'styled-components';
 import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
-
-import { apiMoveBoard } from '@/apis';
 
 const StyledContainer = styled.article`
   display: inline-flex;
@@ -26,8 +23,15 @@ const StyledContainer = styled.article`
   }
 `;
 
+interface ContainerProps {
+  onDragEndExcute(props: { targetIdx: number; category: string; order: number }): void;
+}
+
 /** 2023/09/19 - 보드들의 래퍼 컴포넌트들을 감싸는 컨테이너 컴포넌트 - by 1-blue */
-const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
+const Container: React.FC<React.PropsWithChildren<ContainerProps>> = ({
+  children,
+  onDragEndExcute,
+}) => {
   /** 2023/09/19 - `<Draggable>`이 `<Droppable>`로 드래그 되었을 때 실행되는 이벤트 - by 1-blue */
   const onDragEnd = async ({ source, destination, draggableId }: DropResult) => {
     // 정해지지 않은 공간에 드랍한 경우
@@ -43,19 +47,7 @@ const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
     const destinationCategory = destination.droppableId;
     const destinationOrder = destination.index;
 
-    await apiMoveBoard({
-      idx: targetIdx,
-      category: destinationCategory,
-      order: destinationOrder,
-    });
-
-    // TODO:
-    // mutate('/board', board => board, { revalidate: true });
-    mutate(
-      key => typeof key === 'string' && key.startsWith('/board'),
-      board => board,
-      { revalidate: true },
-    );
+    onDragEndExcute({ targetIdx, category: destinationCategory, order: destinationOrder });
   };
 
   return (

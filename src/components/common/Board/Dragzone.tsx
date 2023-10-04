@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { Draggable } from 'react-beautiful-dnd';
 import { IoEllipsisVerticalSharp, IoTimeOutline, IoAttach } from 'react-icons/io5';
 import styled, { css } from 'styled-components';
@@ -140,6 +140,7 @@ const Dragzone: React.FC<React.PropsWithChildren<DragzoneProps>> = ({
   children,
   ...restProps
 }) => {
+  const { mutate } = useSWRConfig();
   const dispatch = useAppDispatch();
 
   const [isShowDialog, setIsShowDialog] = useState(false);
@@ -176,7 +177,6 @@ const Dragzone: React.FC<React.PropsWithChildren<DragzoneProps>> = ({
 
         toast.success(message);
 
-        // TODO:
         mutate('/board');
       });
     }

@@ -37,21 +37,28 @@ const handler = async (
     }
     // 같은 보드 이동
     else {
-      const targetBoard = await prisma.board.findFirst({
-        where: { category: { category }, order },
-      });
-      if (!targetBoard) return;
-
-      await Promise.allSettled([
-        prisma.board.update({
-          where: { idx: exBoard.idx },
-          data: { order },
-        }),
-        prisma.board.update({
-          where: { idx: targetBoard.idx },
-          data: { order: exBoard.order },
-        }),
-      ]);
+      // 원래 순서보다 더 앞으로 간 경우
+      if (order < exBoard.order) {
+        // 원래 위치와 이동할 위치의 사이에 보드들만 변경 ( +1 )
+        await prisma.board.updateMany({
+          where: {
+            category: { category },
+            AND: [{ order: { lt: exBoard.order } }, { order: { gte: order } }],
+          },
+          data: { order: { increment: 1 } },
+        });
+      }
+      // 원래 순서보다 더 뒤로 간 경우
+      else {
+        // 원래 위치와 이동할 위치의 사이에 보드들만 변경 ( -1 )
+        await prisma.board.updateMany({
+          where: {
+            category: { category },
+            AND: [{ order: { lte: order } }, { order: { gt: exBoard.order } }],
+          },
+          data: { order: { decrement: 1 } },
+        });
+      }
     }
 
     const updatedBoard = await prisma.board.update({

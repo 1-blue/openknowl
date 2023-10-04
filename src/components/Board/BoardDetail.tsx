@@ -137,13 +137,13 @@ const BoardDetail: React.FC = () => {
   if (error) {
     return <Custom500 />;
   }
-  // TODO:
-  if (isLoading)
+  if (isLoading) {
     return (
       <Overlay>
         <Skeleton.BoardDetail />
       </Overlay>
     );
+  }
   if (!board) return <></>;
 
   return (

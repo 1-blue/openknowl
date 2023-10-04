@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { IoCloseCircle } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 
 import { apiUpdateBoard, apiUploadPDF } from '@/apis';
 
@@ -18,10 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/store';
 import { closeBoardForm } from '@/store/slices/board';
 import { startSpinner, stopSpinner } from '@/store/slices/spinner';
 
-import Input from '@/components/common/Input';
-import Combobox from '@/components/common/Combobox';
-import Tag from '@/components/common/Tag';
-import FileInput from '@/components/common/FileInput';
+import Form from '@/components/common/Form';
 import Skeleton from '@/components/common/Skeleton';
 
 import type { Board } from '@prisma/client';
@@ -117,6 +114,7 @@ interface BoardUpdateForm extends Pick<Board, 'name' | 'date'> {
 
 /** 2023/09/20 - Modal BoardUpdateForm Component - by 1-blue */
 const BoardUpdateForm: React.FC = () => {
+  const { mutate } = useSWRConfig();
   const dispatch = useAppDispatch();
   const { targetIdx } = useAppSelector(state => state.board);
 
@@ -181,7 +179,6 @@ const BoardUpdateForm: React.FC = () => {
     })
       .then(({ message }) => {
         toast.success(message);
-        // TODO:
         mutate('/board');
 
         dispatch(stopSpinner());
@@ -214,7 +211,6 @@ const BoardUpdateForm: React.FC = () => {
 
   const formRef = useOuterClick(onClose);
 
-  // TODO: skeleton UI
   if (!board) {
     return <Skeleton.BoardDetail />;
   }
@@ -226,7 +222,7 @@ const BoardUpdateForm: React.FC = () => {
       <h6 className="board-form-title">보드 수정</h6>
 
       <form onSubmit={updateBoard} className="board-form">
-        <Input
+        <Form.Input
           autoFocus
           type="text"
           id="이름"
@@ -242,7 +238,7 @@ const BoardUpdateForm: React.FC = () => {
         />
 
         {categories && (
-          <Combobox
+          <Form.Combobox
             id="카테고리"
             required
             defaultValue={{
@@ -263,7 +259,7 @@ const BoardUpdateForm: React.FC = () => {
         )}
 
         {platforms && (
-          <Combobox
+          <Form.Combobox
             id="플랫폼"
             required
             defaultValue={[
@@ -285,7 +281,7 @@ const BoardUpdateForm: React.FC = () => {
           />
         )}
 
-        <Input
+        <Form.Input
           type="datetime-local"
           id="마감일"
           required
@@ -299,9 +295,9 @@ const BoardUpdateForm: React.FC = () => {
         />
 
         <div className="board-form-pdf-tag-conatiner">
-          <Tag id="태그" tags={tags} createTag={createTag} removeTag={removeTag} />
+          <Form.InputTag id="태그" tags={tags} createTag={createTag} removeTag={removeTag} />
 
-          <FileInput
+          <Form.InputFile
             {...register('files')}
             type="file"
             id="PDF"

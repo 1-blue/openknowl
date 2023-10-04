@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
-const StyledTag = styled.section`
+const StyledInputTag = styled.section`
   display: flex;
   flex-flow: column nowrap;
 
@@ -64,8 +64,8 @@ interface TagProps {
   removeTag: (tag: string) => void;
 }
 
-/** 2023/09/21 - Tag Component - by 1-blue */
-const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
+/** 2023/09/21 - Tag input Component - by 1-blue */
+const InputTag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
   const onCreateTag: React.KeyboardEventHandler<HTMLInputElement> = e => {
     if (!(e.target instanceof HTMLInputElement)) return;
     if (e.key !== 'Enter') return;
@@ -112,7 +112,7 @@ const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
   };
 
   return (
-    <StyledTag>
+    <StyledInputTag>
       <label htmlFor={id} className="input-label">
         {id}
       </label>
@@ -124,8 +124,8 @@ const Tag: React.FC<TagProps> = ({ id, tags, createTag, removeTag }) => {
           </li>
         ))}
       </ul>
-    </StyledTag>
+    </StyledInputTag>
   );
 };
 
-export default Tag;
+export default InputTag;

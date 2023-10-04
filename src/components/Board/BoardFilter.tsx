@@ -7,7 +7,7 @@ import { buildQueryString } from '@/utils/helper';
 import useFetchPlatforms from '@/hooks/useFetchPlatformsOfBoard';
 import useFetchTagsOfBoard from '@/hooks/useFetchTagsOfBoard';
 
-import Combobox from '@/components/common/Combobox';
+import Form from '@/components/common/Form';
 import Skeleton from '@/components/common/Skeleton';
 
 import type { Props as ReactSelectProps } from 'react-select';
@@ -70,7 +70,7 @@ const BoardFilter: React.FC = () => {
 
   return (
     <StyledBoardFilter>
-      <Combobox
+      <Form.Combobox
         id="플랫폼 필터링"
         value={[{ label: platform || '선택안함', value: platform || '선택안함' }]}
         defaultValue={[{ label: platform || '선택안함', value: platform || '선택안함' }]}
@@ -81,7 +81,7 @@ const BoardFilter: React.FC = () => {
         onChange={onSelectPlatform}
         className="board-platform-filter"
       />
-      <Combobox
+      <Form.Combobox
         isMulti
         id="태그 필터링"
         value={tag?.split(',').map(tag => ({ label: tag, value: tag }))}

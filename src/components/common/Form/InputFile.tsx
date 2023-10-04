@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { IoClose } from 'react-icons/io5';
 
-const StyledFileInput = styled.fieldset`
+const StyledInputFile = styled.fieldset`
   position: relative;
   display: flex;
   flex-flow: column nowrap;
@@ -117,7 +117,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 /** 2023/09/25 - "react-hook-form" 전용 file input 컴포넌트 - by 1-blue */
-const FileInput = React.forwardRef<HTMLInputElement, Props>(
+const InputFile = React.forwardRef<HTMLInputElement, Props>(
   (
     { id, info, warning, error, required, labelHidden, replacementName, resetFile, ...props },
     ref,
@@ -125,7 +125,7 @@ const FileInput = React.forwardRef<HTMLInputElement, Props>(
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     return (
-      <StyledFileInput>
+      <StyledInputFile>
         <label htmlFor={id}>
           <span className="input-label">{id}</span>
           {required && <span className="input-label-required"> ( 필수 )</span>}
@@ -160,9 +160,9 @@ const FileInput = React.forwardRef<HTMLInputElement, Props>(
         {info && <span className="input-info">** {info} **</span>}
         {warning && <span className="input-warning">** {warning} **</span>}
         {error && <span className="input-error">** {error} **</span>}
-      </StyledFileInput>
+      </StyledInputFile>
     );
   },
 );
 
-export default FileInput;
+export default InputFile;
