@@ -72,6 +72,7 @@ const BoardFilter: React.FC = () => {
     <StyledBoardFilter>
       <Combobox
         id="플랫폼 필터링"
+        value={[{ label: platform || '선택안함', value: platform || '선택안함' }]}
         defaultValue={[{ label: platform || '선택안함', value: platform || '선택안함' }]}
         options={[{ idx: -1, platform: '선택안함' }, ...platforms].map(({ platform }) => ({
           label: platform,
@@ -83,6 +84,7 @@ const BoardFilter: React.FC = () => {
       <Combobox
         isMulti
         id="태그 필터링"
+        value={tag?.split(',').map(tag => ({ label: tag, value: tag }))}
         defaultValue={tag?.split(',').map(tag => ({ label: tag, value: tag }))}
         options={tags.map(({ tag }) => ({
           label: tag,
