@@ -49,7 +49,7 @@ const BoardFilter: React.FC = () => {
       ...(tag && { tag }),
     });
 
-    router.push(path);
+    router.replace(path);
   };
   /** 2023/09/27 - 태그 필터링 - by 1-blue */
   const onSelectTag: ReactSelectProps<SelectOption>['onChange'] = selected => {
@@ -61,7 +61,7 @@ const BoardFilter: React.FC = () => {
       ...(platform && { platform }),
     });
 
-    router.push(path);
+    router.replace(path);
   };
 
   if (platformsLoading || !platforms || tagsLoading || !tags) {

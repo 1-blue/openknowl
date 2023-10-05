@@ -165,8 +165,8 @@ const BoardDetail: React.FC = () => {
         <span className="board-detail-list-left">남은 기간</span>
         <time className="board-detail-list-right">
           {Date.now() - new Date(board.date).getTime() > 0
-            ? `${pastTimeFormat(board.date)}전`
-            : `${futureTimeFormat(board.date)} 초과`}
+            ? `${pastTimeFormat(board.date)} 지남`
+            : `${futureTimeFormat(board.date)} 전`}
         </time>
       </li>
       <li className="board-detail-list">
