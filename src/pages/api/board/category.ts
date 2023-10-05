@@ -1,6 +1,7 @@
+import { categoryService } from '@/apis/services/category';
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { ApiFindAllCategoriesOfBoardResponse } from '@/types/apis';
-import prisma from '@/prisma';
 
 /**
  * @swagger
@@ -20,7 +21,7 @@ const handler = async (
 
   // 모든 카테고리 찾기
   if (method === 'GET') {
-    const categories = await prisma.category.findMany();
+    const categories = await categoryService.findAll();
 
     return res.status(200).json({ data: categories });
   }

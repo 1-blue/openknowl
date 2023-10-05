@@ -15,7 +15,10 @@ export interface ApiFindOneBoardRequest {
 export interface ApiFindOneBoardResponse extends ApiResponse<BoardWithETC> {}
 
 /** 2023/09/18 - 모든 보드 요청 타입 - by 1-blue */
-export interface ApiFindAllBoardsRequest {}
+export interface ApiFindAllBoardsRequest {
+  platform?: string;
+  tag?: string;
+}
 /** 2023/09/18 - 모든 보드 응답 타입 - by 1-blue */
 export interface ApiFindAllBoardsResponse extends ApiResponse<BoardWithETC[][]> {}
 

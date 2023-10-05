@@ -1,6 +1,7 @@
+import { platformService } from '@/apis/services/platform';
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { ApiFindAllPlatformsOfBoardResponse } from '@/types/apis';
-import prisma from '@/prisma';
 
 /**
  * @swagger
@@ -20,9 +21,9 @@ const handler = async (
 
   // 모든 플랫폼 찾기
   if (method === 'GET') {
-    const categories = await prisma.platform.findMany();
+    const platforms = await platformService.findAll();
 
-    return res.status(200).json({ data: categories });
+    return res.status(200).json({ data: platforms });
   }
 };
 

@@ -1,6 +1,7 @@
+import { tagService } from '@/apis/services/tag';
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { ApiFindAllTagsOfBoardResponse } from '@/types/apis';
-import prisma from '@/prisma';
 
 /**
  * @swagger
@@ -20,7 +21,7 @@ const handler = async (
 
   // 모든 태그 찾기
   if (method === 'GET') {
-    const tags = await prisma.tag.findMany();
+    const tags = await tagService.findAll();
 
     return res.status(200).json({ data: tags });
   }
