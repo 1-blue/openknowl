@@ -16,6 +16,7 @@ import CardDialog from '@/components/Card/CardDialog';
 import type { CardWithETC } from '@/types/apis';
 
 const StyledCard = styled.div<{ $isPast: boolean }>`
+  width: 240px;
   position: relative;
   padding: 0.8em 0.6em;
 

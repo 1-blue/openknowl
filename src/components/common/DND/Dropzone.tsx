@@ -1,40 +1,46 @@
 import { Droppable } from 'react-beautiful-dnd';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { DroppableProps } from 'react-beautiful-dnd';
 
-const StyledDropzone = styled.section`
-  flex: 1;
-  width: 240px;
-  height: 100%;
+const StyledDropzone = styled.ul<{ $isHorizontal: boolean }>`
+  display: flex;
 
-  & .dnd-dropzone {
-    & > * + * {
-      margin-top: 0.8em;
-    }
-  }
+  ${({ $isHorizontal }) =>
+    $isHorizontal
+      ? css`
+          flex-direction: row;
+          & > * + * {
+            margin-left: 1em;
+          }
+        `
+      : css`
+          flex-direction: column;
+          & > * + * {
+            margin-top: 0.6em;
+          }
+        `}
 `;
 
 //? children이 중복되어서 제외함
 interface DropzoneProps extends Omit<DroppableProps, 'children'> {}
 
-/** 2023/09/19 - 보드들을 감싸는 래퍼 컴포넌트 ( 보드를 사용하기 위한 설정들 적용 ) - by 1-blue */
+/** 2023/09/19 - Drag & Drop의 드래그 컴포넌트 - by 1-blue */
 const Dropzone: React.FC<React.PropsWithChildren<DropzoneProps>> = ({ children, ...restProps }) => {
   return (
-    <StyledDropzone>
-      <Droppable {...restProps}>
-        {(provided, snapshot) => (
-          <ul
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            className={'dnd-dropzone' + (snapshot.draggingOverWith ? ' dnd-dropzone-hover' : '')}
-          >
-            {children}
-            {provided.placeholder}
-          </ul>
-        )}
-      </Droppable>
-    </StyledDropzone>
+    <Droppable {...restProps}>
+      {(provided, snapshot) => (
+        <StyledDropzone
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+          $isHorizontal={restProps.direction === 'horizontal'}
+          className={snapshot.draggingOverWith ? ' dnd-dropzone-hover' : ''}
+        >
+          {children}
+          {provided.placeholder}
+        </StyledDropzone>
+      )}
+    </Droppable>
   );
 };
 

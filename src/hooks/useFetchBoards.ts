@@ -16,8 +16,8 @@ const useFetchBoards = () => {
   );
 
   const boardsMutate = ({
-    idx,
     sourceBoardIdx,
+    sourceOrder,
     destinationBoardIdx,
     destinationOrder,
   }: ApiMoveCardRequest) =>
@@ -31,12 +31,39 @@ const useFetchBoards = () => {
           JSON.stringify(currentBoards.data),
         ) as typeof currentBoards.data;
 
-        // 이동할 카드 잘라내기
-        const targetBoardIndex = copyBoards.findIndex(board => board.idx === sourceBoardIdx);
-        const targetCardIndex = copyBoards[targetBoardIndex].cards.findIndex(
-          card => card.idx === idx,
+        /** 출발 보드 인덱스 */
+        const sourceBoardIndex = copyBoards.findIndex(board => board.idx === sourceBoardIdx);
+        /** 출발 카드 인덱스 */
+        const sourceCardIndex = copyBoards[sourceBoardIndex].cards.findIndex(
+          card => card.order === sourceOrder,
         );
-        const [target] = copyBoards[targetBoardIndex].cards.splice(targetCardIndex, 1);
+        /** 도착 보드 인덱스 */
+        const destinationBoardIndex = copyBoards.findIndex(
+          board => board.idx === destinationBoardIdx,
+        );
+
+        // 출발 위치의 카드들 order 수정
+        copyBoards[sourceBoardIndex].cards = copyBoards[sourceBoardIndex].cards.map(card => {
+          if (card.order < sourceOrder) return card;
+
+          // 출발 카드 위치보다 뒤에 있다면 -1
+          return { ...card, order: card.order - 1 };
+        });
+        // 도착 위치의 카드들 order 수정
+        copyBoards[destinationBoardIndex].cards = copyBoards[destinationBoardIndex].cards.map(
+          card => {
+            if (card.order < destinationOrder) return card;
+
+            // 도착 카드 위치보다 뒤에 있다면 +1
+            return { ...card, order: card.order + 1 };
+          },
+        );
+
+        // 이동할 카드 잘라내기
+        const [target] = copyBoards[sourceBoardIndex].cards.splice(sourceCardIndex, 1);
+
+        // 이동할 카드 순서 변경
+        target.order = destinationOrder;
 
         // 이동할 카드 붙여넣기
         copyBoards

@@ -1,5 +1,4 @@
 import { toast } from 'react-toastify';
-import { useSWRConfig } from 'swr';
 import { useRouter } from 'next/router';
 import { useSearchParams } from 'next/navigation';
 
@@ -22,11 +21,10 @@ import BoardCreateButton from '@/components/Board/BoardCreateButton';
 import CardFilter from '@/components/Card/CardFilter';
 import Card from '@/components/Card/Card';
 
-import type { ApiMoveCardRequest } from '@/types/apis';
+import type { OnDragEndResponder } from 'react-beautiful-dnd';
 
 /** 2023/09/18 - 메인 페이지 - by 1-blue */
 const Home = () => {
-  const { mutate } = useSWRConfig();
   const dispatch = useAppDispatch();
   const { boards, isLoading, error, boardsMutate } = useFetchBoards();
   const { categories } = useFetchCategories();
@@ -85,10 +83,43 @@ const Home = () => {
     }
   };
 
-  /** 2023/10/04 - 보드 드래그 완료 후 실행할 함수 - by 1-blue */
-  const onDragEndExecute = (props: ApiMoveCardRequest) => {
-    boardsMutate(props);
-    apiMoveCard(props).then(() => mutate('/board'));
+  /** 2023/10/07 - 보드 드래그 완료 후 실행할 함수 - by 1-blue */
+  const onDragEnd: OnDragEndResponder = ({ type, source, destination, draggableId }) => {
+    // 정해지지 않은 공간에 드랍한 경우
+    if (!destination) return;
+
+    // 보드를 Drag & Drop한 경우
+    if (type === 'BOARD') {
+      console.log('source, destination, draggableId >> ', source, destination, draggableId);
+    }
+
+    // 카드인 경우
+    if (type === 'CARD') {
+      /** 이동될 카드의 식별자 */
+      const targetIdx = +draggableId.slice(-1);
+      /** 시작 보드의 식별자 */
+      const sourceBoardIdx = +source.droppableId.slice(-1);
+      /** 시작 카드의 순서 */
+      const sourceOrder = source.index;
+      /** 도착 보드의 식별자 */
+      const destinationBoardIdx = +destination.droppableId.slice(-1);
+      /** 도착 카드의 순서 */
+      const destinationOrder = destination.index;
+
+      // 같은 위치에 드랍한 경우
+      if (destinationBoardIdx === sourceBoardIdx && destinationOrder === sourceOrder) return;
+
+      const props = {
+        idx: targetIdx,
+        sourceBoardIdx,
+        sourceOrder,
+        destinationBoardIdx,
+        destinationOrder,
+      };
+
+      boardsMutate(props);
+      apiMoveCard(props);
+    }
   };
 
   if (error) return <Custom500 />;
@@ -111,27 +142,41 @@ const Home = () => {
         {isLoading || !boards || !categories ? (
           <Skeleton.BoardGroup />
         ) : (
-          <DND.Container onDragEndExecute={onDragEndExecute}>
-            {boards.map(board => (
-              <section key={board.category!.category} className="dnd-wrapper">
-                <BoardHeader category={board.category!.category} />
+          // 전체 Drag & Drop 영역 지정
+          <DND.Container onDragEnd={onDragEnd}>
+            {/* Board Drop 영역 지정 */}
+            <DND.Dropzone droppableId="BOARD" type="BOARD" direction="horizontal">
+              {boards.map((board, index) => (
+                // Board Drag 영역 지정
+                <DND.Dragzone
+                  key={'BOARD' + board.idx}
+                  draggableId={'BOARD' + board.idx}
+                  index={index}
+                >
+                  <section className="dnd-board-wrapper">
+                    <BoardHeader category={board.category!.category} />
 
-                <DND.Dropzone droppableId={board.idx + ''}>
-                  {board.cards.map(card => (
-                    <DND.Dragzone
-                      key={card.idx + ''}
-                      draggableId={card.idx + ''}
-                      index={card.order}
+                    {/* Card 드랍 영역 지정 */}
+                    <DND.Dropzone
+                      droppableId={'BOARD' + board.idx}
+                      type="CARD"
+                      direction="vertical"
                     >
-                      <Card {...card} />
-                    </DND.Dragzone>
-                  ))}
-                </DND.Dropzone>
-              </section>
-            ))}
-
-            {/* FIXME: */}
-            <BoardCreateButton />
+                      {board.cards.map(card => (
+                        // Card 드래그 영역 지정
+                        <DND.Dragzone
+                          key={'CARD' + card.idx}
+                          draggableId={'CARD' + card.idx}
+                          index={card.order}
+                        >
+                          <Card {...card} />
+                        </DND.Dragzone>
+                      ))}
+                    </DND.Dropzone>
+                  </section>
+                </DND.Dragzone>
+              ))}
+            </DND.Dropzone>
           </DND.Container>
         )}
       </Dropzone>
