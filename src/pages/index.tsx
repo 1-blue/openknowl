@@ -17,7 +17,7 @@ import DND from '@/components/common/DND';
 import Skeleton from '@/components/common/Skeleton';
 import Dropzone from '@/components/common/Dropzone';
 import BoardHeader from '@/components/Board/BoardHeader';
-import BoardCreateButton from '@/components/Board/BoardCreateButton';
+import BoardCreateForm from '@/components/Board/BoardCreateForm';
 import CardFilter from '@/components/Card/CardFilter';
 import Card from '@/components/Card/Card';
 
@@ -177,6 +177,9 @@ const Home = () => {
                 </DND.Dragzone>
               ))}
             </DND.Dropzone>
+
+            {/* 보드 생성 폼 */}
+            <BoardCreateForm />
           </DND.Container>
         )}
       </Dropzone>

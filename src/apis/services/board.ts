@@ -1,7 +1,11 @@
 import prisma from '@/prisma';
 
 import type { Prisma } from '@prisma/client';
-import type { ApiFindAllBoardsRequest, ApiDeleteBoardRequest } from '@/types/apis';
+import type {
+  ApiFindAllBoardsRequest,
+  ApiDeleteBoardRequest,
+  ApiCreateBoardRequest,
+} from '@/types/apis';
 
 export const boardService = {
   /** 2023/10/06 - 모드 보드 찾기 - by 1-blue */
@@ -47,5 +51,32 @@ export const boardService = {
     const deletedBoard = await prisma.board.delete({ where: { idx } });
 
     return deletedBoard;
+  },
+  /** 2023/10/07 - 모든 보드 개수 - by 1-blue */
+  async count() {
+    const count = await prisma.board.count();
+
+    return count;
+  },
+  /** 2023/10/07 - 보드 생성 - by 1-blue */
+  async create({ category }: ApiCreateBoardRequest) {
+    const count = await this.count();
+
+    const createdBoard = await prisma.board.create({
+      data: {
+        category: {
+          create: {
+            category,
+          },
+        },
+        order: count,
+      },
+      include: {
+        cards: { include: { platform: true, tags: true } },
+        category: true,
+      },
+    });
+
+    return createdBoard;
   },
 };

@@ -3,18 +3,13 @@ import { DragDropContext, type OnDragEndResponder } from 'react-beautiful-dnd';
 
 const StyledContainer = styled.article`
   display: inline-flex;
-  flex-flow: column nowrap;
-
   padding: 1em;
 
   border: 2px solid ${({ theme }) => theme.colors.gray400};
   border-radius: 0.2em;
 
-  & > * + * {
-    margin-top: 1em;
-  }
-
   & .dnd-board-wrapper {
+    width: 280px;
     padding: 1em;
 
     background-color: ${({ theme }) => theme.colors.gray200};

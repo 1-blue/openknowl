@@ -28,3 +28,10 @@ export interface ApiDeleteBoardRequest {
 }
 /** 2023/10/07 - 특정 보드 제거 응답 타입 - by 1-blue */
 export interface ApiDeleteBoardResponse extends ApiResponse<Board> {}
+
+/** 2023/10/07 - 보드 생성 요청 타입 - by 1-blue */
+export interface ApiCreateBoardRequest {
+  category: string;
+}
+/** 2023/10/07 - 보드 생성 응답 타입 - by 1-blue */
+export interface ApiCreateBoardResponse extends ApiResponse<BoardWithETC> {}

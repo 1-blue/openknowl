@@ -5,9 +5,11 @@ import reset from 'styled-reset';
 export const GlobalStyle = createGlobalStyle`
   ${reset}
 
-  body {
+  * {
     box-sizing: border-box;
+  }
 
+  body {
     line-height: 1;
 
     font-family: "Pretendard", "Noto Sans KR", sans-serif;
