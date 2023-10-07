@@ -21,3 +21,10 @@ export interface ApiFindOneBoardRequest {
 }
 /** 2023/10/06 - 특정 보드 응답 타입 - by 1-blue */
 export interface ApiFindOneBoardResponse extends ApiResponse<BoardWithETC> {}
+
+/** 2023/10/07 - 특정 보드 제거 요청 타입 - by 1-blue */
+export interface ApiDeleteBoardRequest {
+  idx: number;
+}
+/** 2023/10/07 - 특정 보드 제거 응답 타입 - by 1-blue */
+export interface ApiDeleteBoardResponse extends ApiResponse<Board> {}

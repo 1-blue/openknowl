@@ -1,7 +1,7 @@
 import prisma from '@/prisma';
 
 import type { Prisma } from '@prisma/client';
-import type { ApiFindAllBoardsRequest } from '@/types/apis';
+import type { ApiFindAllBoardsRequest, ApiDeleteBoardRequest } from '@/types/apis';
 
 export const boardService = {
   /** 2023/10/06 - 모드 보드 찾기 - by 1-blue */
@@ -35,5 +35,17 @@ export const boardService = {
     const exBoard = await prisma.board.findFirst({ where: { category: { category } } });
 
     return exBoard;
+  },
+  /** 2023/10/07 - 특정 보드 찾기 - by 1-blue */
+  async findOne({ idx }: { idx: number }) {
+    const exBoard = await prisma.board.findUnique({ where: { idx } });
+
+    return exBoard;
+  },
+  /** 2023/10/07 - 보드 제거 - by 1-blue */
+  async delete({ idx }: ApiDeleteBoardRequest) {
+    const deletedBoard = await prisma.board.delete({ where: { idx } });
+
+    return deletedBoard;
   },
 };
