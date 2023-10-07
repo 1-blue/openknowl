@@ -4,18 +4,18 @@ import styled, { css } from 'styled-components';
 import { toast } from 'react-toastify';
 import { IoEllipsisVerticalSharp, IoTimeOutline, IoAttach } from 'react-icons/io5';
 
-import { apiDeleteBoard } from '@/apis';
+import { apiDeleteCard } from '@/apis';
 
 import { useAppDispatch } from '@/store';
-import { openBoardForm } from '@/store/slices/board';
+import { openCardForm } from '@/store/slices/card';
 
 import { dateFormat, futureTimeFormat, pastTimeFormat } from '@/utils/time';
 
-import BoardDialog from '@/components/Board/BoardDialog';
+import CardDialog from '@/components/Card/CardDialog';
 
-import type { BoardWithETC } from '@/types/apis';
+import type { CardWithETC } from '@/types/apis';
 
-const StyledBoard = styled.div<{ $isPast: boolean }>`
+const StyledCard = styled.div<{ $isPast: boolean }>`
   position: relative;
   padding: 0.8em 0.6em;
 
@@ -34,18 +34,18 @@ const StyledBoard = styled.div<{ $isPast: boolean }>`
     margin-top: 1em;
   }
 
-  & > .board-top-container {
+  & > .card-top-container {
     display: flex;
     align-items: center;
 
-    & > .board-top-wrapper {
+    & > .card-top-wrapper {
       display: flex;
 
-      & > .board-checkbox {
+      & > .card-checkbox {
         width: 16px;
         height: 16px;
       }
-      & > .board-name {
+      & > .card-name {
         margin-left: 0.2em;
 
         line-height: 1.3em;
@@ -53,7 +53,7 @@ const StyledBoard = styled.div<{ $isPast: boolean }>`
         font-weight: bold;
       }
     }
-    & > .board-option-button {
+    & > .card-option-button {
       margin-left: auto;
       padding: 0.2em;
 
@@ -67,7 +67,7 @@ const StyledBoard = styled.div<{ $isPast: boolean }>`
       }
     }
   }
-  & > .board-platform {
+  & > .card-platform {
     display: inline-block;
     padding: 0.2em 0.4em;
 
@@ -78,12 +78,12 @@ const StyledBoard = styled.div<{ $isPast: boolean }>`
     border: 1px solid ${({ theme }) => theme.colors.gray300};
     background-color: ${({ theme }) => theme.colors.gray100};
   }
-  & .board-tag-container {
+  & .card-tag-container {
     display: flex;
     flex-flow: row wrap;
     gap: 0.6em;
 
-    & > .board-tag {
+    & > .card-tag {
       padding: 0.4em;
 
       border-radius: 0.8em;
@@ -92,12 +92,12 @@ const StyledBoard = styled.div<{ $isPast: boolean }>`
       background-color: ${({ theme }) => theme.colors.main100};
     }
   }
-  & > .board-bottom-container {
+  & > .card-bottom-container {
     display: flex;
     justify-content: space-between;
     pointer-events: none;
 
-    & > .board-bottom-wrapper {
+    & > .card-bottom-wrapper {
       display: flex;
       align-items: center;
 
@@ -105,14 +105,14 @@ const StyledBoard = styled.div<{ $isPast: boolean }>`
         margin-left: 0.4em;
       }
 
-      & > .board-clock-icon {
+      & > .card-clock-icon {
         width: 16px;
         height: 16px;
         margin-right: 0.1em;
 
         color: ${({ theme }) => theme.colors.gray400};
       }
-      & > .board-date {
+      & > .card-date {
         display: block;
 
         color: ${({ theme }) => theme.colors.gray400};
@@ -120,7 +120,7 @@ const StyledBoard = styled.div<{ $isPast: boolean }>`
         font-weight: 600;
       }
     }
-    & > .board-clip-icon {
+    & > .card-clip-icon {
       width: 20px;
       height: 20px;
 
@@ -129,11 +129,11 @@ const StyledBoard = styled.div<{ $isPast: boolean }>`
   }
 `;
 
-interface BoardProps
-  extends Pick<BoardWithETC, 'idx' | 'name' | 'date' | 'platform' | 'tags' | 'pdf'> {}
+interface CardProps
+  extends Pick<CardWithETC, 'idx' | 'name' | 'date' | 'platformIdx' | 'tags' | 'pdf'> {}
 
-/** 2023/10/05 - Board Component - by 1-blue */
-const Board: React.FC<BoardProps> = ({ idx, name, date, platform, tags, pdf }) => {
+/** 2023/10/05 - Card Component - by 1-blue */
+const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf }) => {
   const { mutate } = useSWRConfig();
   const dispatch = useAppDispatch();
 
@@ -162,16 +162,16 @@ const Board: React.FC<BoardProps> = ({ idx, name, date, platform, tags, pdf }) =
 
     // 수정
     if (type === 'update') {
-      dispatch(openBoardForm({ idx }));
+      dispatch(openCardForm({ idx }));
     }
     // 삭제
     if (type === 'delete') {
-      apiDeleteBoard({ idx }).then(({ message, data }) => {
+      apiDeleteCard({ idx }).then(({ message, data }) => {
         if (!data) return;
 
         toast.success(message);
 
-        mutate('/board');
+        mutate('/card');
       });
     }
   };
@@ -179,47 +179,47 @@ const Board: React.FC<BoardProps> = ({ idx, name, date, platform, tags, pdf }) =
   const isPast = Date.now() - new Date(date).getTime() > 0;
 
   return (
-    <StyledBoard $isPast={isPast} data-target-idx={idx}>
-      <div className="board-top-container">
-        <div className="board-top-wrapper">
-          <input type="checkbox" className="board-checkbox" />
-          <span className="board-name">{name}</span>
+    <StyledCard $isPast={isPast} data-target-idx={idx}>
+      <div className="card-top-container">
+        <div className="card-top-wrapper">
+          <input type="checkbox" className="card-checkbox" />
+          <span className="card-name">{name}</span>
         </div>
         <IoEllipsisVerticalSharp
           role="button"
-          className="board-option-button"
+          className="card-option-button"
           onClick={onOpenDialog}
         />
       </div>
-      <button type="button" className="board-platform" data-platform={platform.platform}>
-        {platform.platform}
+      <button type="button" className="card-platform" data-platform={platformIdx}>
+        {platformIdx}
       </button>
-      <ul className="board-tag-container">
+      <ul className="card-tag-container">
         {tags.map(({ tag }) => (
-          <li key={tag} className="board-tag" role="button" data-tag={tag}>
+          <li key={tag} className="card-tag" role="button" data-tag={tag}>
             {tag}
           </li>
         ))}
       </ul>
-      <div className="board-bottom-container">
-        <div className="board-bottom-wrapper">
-          <IoTimeOutline className="board-clock-icon" />
-          <time className="board-date">{dateFormat(date, 'YYYY.MM.DD')}</time>
-          <time className="board-date">{dateFormat(date, 'hh:mm:ss')}</time>
-          <time className="board-date">
+      <div className="card-bottom-container">
+        <div className="card-bottom-wrapper">
+          <IoTimeOutline className="card-clock-icon" />
+          <time className="card-date">{dateFormat(date, 'YYYY.MM.DD')}</time>
+          <time className="card-date">{dateFormat(date, 'hh:mm:ss')}</time>
+          <time className="card-date">
             ( {isPast ? `-${pastTimeFormat(date)}` : `+${futureTimeFormat(date)}`} )
           </time>
         </div>
 
-        {pdf && <IoAttach className="board-clip-icon" />}
+        {pdf && <IoAttach className="card-clip-icon" />}
       </div>
       {isShowDialog && (
         <div onClick={onOpenDialogByBubbling} style={{ margin: 0 }}>
-          <BoardDialog onClose={onCloseDialog} pdfURL={pdf} />
+          <CardDialog onClose={onCloseDialog} pdfURL={pdf} />
         </div>
       )}
-    </StyledBoard>
+    </StyledCard>
   );
 };
 
-export default Board;
+export default Card;

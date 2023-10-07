@@ -4,8 +4,8 @@ import { useRouter } from 'next/router';
 
 import { buildQueryString } from '@/utils/helper';
 
-import useFetchPlatforms from '@/hooks/useFetchPlatformsOfBoard';
-import useFetchTagsOfBoard from '@/hooks/useFetchTagsOfBoard';
+import useFetchPlatforms from '@/hooks/useFetchPlatforms';
+import useFetchTagsOfCard from '@/hooks/useFetchTagsOfCard';
 
 import Form from '@/components/common/Form';
 import Skeleton from '@/components/common/Skeleton';
@@ -13,7 +13,7 @@ import Skeleton from '@/components/common/Skeleton';
 import type { Props as ReactSelectProps } from 'react-select';
 import type { SelectOption } from '@/types';
 
-const StyledBoardFilter = styled.div`
+const StyledCardFilter = styled.div`
   display: flex;
   margin-bottom: 1em;
 
@@ -21,23 +21,23 @@ const StyledBoardFilter = styled.div`
     margin-left: 1em;
   }
 
-  & .board-platform-filter {
+  & .card-platform-filter {
     width: 120px;
   }
-  & .board-tag-filter {
+  & .card-tag-filter {
     width: 320px;
   }
 `;
 
-/** 2023/09/27 - Board Filter Component - by 1-blue */
-const BoardFilter: React.FC = () => {
+/** 2023/09/27 - Card Filter Component - by 1-blue */
+const CardFilter: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const platform = searchParams.get('platform');
   const tag = searchParams.get('tag');
 
   const { platforms, isLoading: platformsLoading } = useFetchPlatforms();
-  const { tags, isLoading: tagsLoading } = useFetchTagsOfBoard();
+  const { tags, isLoading: tagsLoading } = useFetchTagsOfCard();
 
   /** 2023/09/27 - 플랫폼 필터링 - by 1-blue */
   const onSelectPlatform: ReactSelectProps<SelectOption>['onChange'] = selected => {
@@ -69,7 +69,7 @@ const BoardFilter: React.FC = () => {
   }
 
   return (
-    <StyledBoardFilter>
+    <StyledCardFilter>
       <Form.Combobox
         id="플랫폼 필터링"
         value={[{ label: platform || '선택안함', value: platform || '선택안함' }]}
@@ -79,7 +79,7 @@ const BoardFilter: React.FC = () => {
           value: platform,
         }))}
         onChange={onSelectPlatform}
-        className="board-platform-filter"
+        className="card-platform-filter"
       />
       <Form.Combobox
         isMulti
@@ -91,11 +91,11 @@ const BoardFilter: React.FC = () => {
           value: tag,
         }))}
         onChange={onSelectTag}
-        className="board-tag-filter"
+        className="card-tag-filter"
         placeholder="태그들을 선택해주세요!"
       />
-    </StyledBoardFilter>
+    </StyledCardFilter>
   );
 };
 
-export default BoardFilter;
+export default CardFilter;

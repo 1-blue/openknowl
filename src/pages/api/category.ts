@@ -1,11 +1,11 @@
 import { categoryService } from '@/apis/services/category';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import type { ApiFindAllCategoriesOfBoardResponse } from '@/types/apis';
+import type { ApiFindAllCategoriesOfCardResponse } from '@/types/apis';
 
 /**
  * @swagger
- * /api/board/category:
+ * /api/category:
  *  get:
  *    summary: 등록된 모든 카테고리 요청
  *    description: 등록된 모든 카테고리 요청
@@ -15,7 +15,7 @@ import type { ApiFindAllCategoriesOfBoardResponse } from '@/types/apis';
  */
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<ApiFindAllCategoriesOfBoardResponse>,
+  res: NextApiResponse<ApiFindAllCategoriesOfCardResponse>,
 ) => {
   const { method } = req;
 

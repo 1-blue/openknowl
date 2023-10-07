@@ -1,28 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { IoCloseCircle } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { useSWRConfig } from 'swr';
 
-import { apiCreateBoard, apiUploadPDF } from '@/apis';
+import { apiUpdateCard, apiUploadPDF } from '@/apis';
 
-import useFetchCategories from '@/hooks/useFetchCategoriesOfBoard';
-import useFetchPlatforms from '@/hooks/useFetchPlatformsOfBoard';
+import { getPDFName } from '@/utils/board';
+
+import useFetchCategories from '@/hooks/useFetchCategories';
+import useFetchPlatforms from '@/hooks/useFetchPlatforms';
+import useFetchCard from '@/hooks/useFetchCard';
 import useOuterClick from '@/hooks/useOuterClick';
 
 import { useAppDispatch, useAppSelector } from '@/store';
-import { closeBoardForm } from '@/store/slices/board';
+import { closeCardForm } from '@/store/slices/card';
 import { startSpinner, stopSpinner } from '@/store/slices/spinner';
 
 import Form from '@/components/common/Form';
+import Skeleton from '@/components/common/Skeleton';
 
-import type { Board } from '@prisma/client';
+import type { Card } from '@prisma/client';
 
-const StyledBoardCreateFormWrapper = styled.article`
+const StyledCardUpdateForm = styled.article`
   position: relative;
 
-  & > .board-form-close-button {
+  & > .card-form-close-button {
     position: absolute;
     top: 0.9em;
     left: 0.6em;
@@ -39,7 +43,7 @@ const StyledBoardCreateFormWrapper = styled.article`
     }
   }
 
-  & > .board-form-title {
+  & > .card-form-title {
     padding: 0.6em;
 
     color: #fff;
@@ -49,14 +53,14 @@ const StyledBoardCreateFormWrapper = styled.article`
     text-align: center;
   }
 
-  & > .board-form {
+  & > .card-form {
     padding: 1.6em 2.4em;
 
     & > * + * {
       margin-top: 1em;
     }
 
-    & > .board-form-pdf-tag-conatiner {
+    & > .card-form-pdf-tag-conatiner {
       display: flex;
 
       & > * {
@@ -68,15 +72,15 @@ const StyledBoardCreateFormWrapper = styled.article`
       }
     }
 
-    & > .board-form-button-wrapper {
+    & > .card-form-button-wrapper {
       text-align: end;
 
       & > * + * {
         margin-left: 0.5em;
       }
 
-      & > .board-form-cancel-button,
-      .board-form-excute-button {
+      & > .card-form-cancel-button,
+      .card-form-excute-button {
         padding: 0.6em 0.8em;
 
         border: 0;
@@ -86,14 +90,14 @@ const StyledBoardCreateFormWrapper = styled.article`
         cursor: pointer;
         transition: all 0.3s;
       }
-      & > .board-form-cancel-button {
+      & > .card-form-cancel-button {
         background-color: ${({ theme }) => theme.colors.red400};
 
         &:hover {
           background-color: ${({ theme }) => theme.colors.red500};
         }
       }
-      & > .board-form-excute-button {
+      & > .card-form-excute-button {
         background-color: ${({ theme }) => theme.colors.main400};
 
         &:hover {
@@ -104,16 +108,17 @@ const StyledBoardCreateFormWrapper = styled.article`
   }
 `;
 
-interface BoardCreateForm extends Pick<Board, 'name' | 'date'> {
+interface CardUpdateFormType extends Pick<Card, 'name' | 'date'> {
   files?: File[];
 }
 
-/** 2023/09/20 - Modal BoardCreateForm Component - by 1-blue */
-const BoardCreateForm: React.FC = () => {
+/** 2023/09/20 - Modal BoardUpdateForm Component - by 1-blue */
+const CardUpdateForm: React.FC = () => {
   const { mutate } = useSWRConfig();
   const dispatch = useAppDispatch();
-  const { category: defaultCategoty, file } = useAppSelector(state => state.board);
+  const { targetIdx } = useAppSelector(state => state.card);
 
+  const { card } = useFetchCard({ idx: targetIdx });
   const { categories } = useFetchCategories();
   const { platforms } = useFetchPlatforms();
 
@@ -124,14 +129,16 @@ const BoardCreateForm: React.FC = () => {
     formState: { errors },
     watch,
     setValue,
-  } = useForm<BoardCreateForm>({ defaultValues: { files: [file] } });
+  } = useForm<CardUpdateFormType>();
 
   // category
-  const [category, setCategory] = useState(defaultCategoty || categories?.[0].category || '신규');
+  const [category, setCategory] = useState(categories?.[0].category || '신규');
   // platform
   const [platform, setPlatform] = useState(platforms?.[0].platform || '미니인턴');
   // tags
   const [tags, setTags] = useState<string[]>([]);
+  // pdf
+  const [pdf, setPDF] = useState<string | null>(null);
 
   /** 2023/09/21 - 태그 생성 - by 1-blue */
   const createTag = (tag: string) => {
@@ -146,8 +153,8 @@ const BoardCreateForm: React.FC = () => {
     setTags(prev => prev.filter(v => v !== tag));
   };
 
-  /** 2023/09/21 - 보드 생성 요청 핸들러 - by 1-blue */
-  const createBoard: React.FormEventHandler = handleSubmit(async ({ name, date, files }) => {
+  /** 2023/09/21 - 보드 수정 요청 핸들러 - by 1-blue */
+  const updateBoard: React.FormEventHandler = handleSubmit(async ({ name, date, files }) => {
     let pdfURL: string | null = null;
 
     // 1. 이미지 업로드
@@ -161,66 +168,84 @@ const BoardCreateForm: React.FC = () => {
       }
     }
 
-    // 2. 보드 생성
-    apiCreateBoard({
+    apiUpdateCard({
+      idx: targetIdx,
       name,
       date,
       category,
       platform,
       tags,
-      pdf: pdfURL,
+      pdf: pdfURL || pdf,
     })
       .then(({ message }) => {
         toast.success(message);
-        mutate('/board');
+        mutate('/card');
 
         dispatch(stopSpinner());
-        dispatch(closeBoardForm());
+        dispatch(closeCardForm());
       })
+      // FIXME:
       .catch(console.error);
   });
+
+  useEffect(() => {
+    if (!card) return;
+
+    // TODO:
+    // setCategory(card.category.category);
+    setPlatform(card.platform.platform);
+    setTags(card.tags.map(({ tag }) => tag));
+    setPDF(card.pdf);
+  }, [card]);
 
   const currentFiles = watch('files');
   const resetFile = () => {
     setValue('files', undefined);
+    setPDF(null);
   };
 
   const onClose = () => {
-    if (!confirm('폼을 닫으면 작성하신 내용이 저장되지 않습니다.')) return;
+    if (!confirm('폼을 닫으면 수정하신 내용이 저장되지 않습니다.')) return;
 
-    dispatch(closeBoardForm());
+    dispatch(closeCardForm());
   };
 
   const formRef = useOuterClick(onClose);
 
+  if (!card) return <Skeleton.BoardDetail />;
+
   return (
-    <StyledBoardCreateFormWrapper ref={formRef}>
-      <IoCloseCircle role="button" className="board-form-close-button" onClick={onClose} />
+    <StyledCardUpdateForm ref={formRef}>
+      <IoCloseCircle role="button" className="card-form-close-button" onClick={onClose} />
 
-      <h6 className="board-form-title">보드 생성</h6>
+      <h6 className="card-form-title">보드 수정</h6>
 
-      <form onSubmit={createBoard} className="board-form">
+      <form onSubmit={updateBoard} className="card-form">
         <Form.Input
           autoFocus
           type="text"
           id="이름"
           placeholder="ex) 김인턴"
           required
+          defaultValue={card.name}
           error={errors.name?.message}
-          defaultValue={process.env['NODE_ENV'] === 'development' ? '테스트' : ''}
           {...register('name', {
             required: { value: true, message: '이름을 입력해주세요!' },
             minLength: { value: 2, message: '최소 2자를 입력해주세요!' },
             maxLength: { value: 12, message: '최대 12자를 입력해주세요!' },
           })}
         />
+
         {categories && (
           <Form.Combobox
             id="카테고리"
             required
             defaultValue={{
-              value: defaultCategoty || categories?.[0].category || '신규',
-              label: defaultCategoty || categories?.[0].category || '신규',
+              // TODO:
+              value: '임시',
+              label: '임시',
+              // value: card.category.category,
+              // label: card.category.category,
             }}
             options={categories.map(({ category }) => ({
               label: category,
@@ -241,8 +266,8 @@ const BoardCreateForm: React.FC = () => {
             required
             defaultValue={[
               {
-                label: platforms?.[0].platform || '미니인턴',
-                value: platforms?.[0].platform || '미니인턴',
+                label: card.platform.platform,
+                value: card.platform.platform,
               },
             ]}
             options={platforms.map(({ platform }) => ({
@@ -262,14 +287,16 @@ const BoardCreateForm: React.FC = () => {
           type="datetime-local"
           id="마감일"
           required
-          defaultValue={new Date(Date.now() + 1000 * 60 * 60 * 9).toISOString().substring(0, 16)}
+          defaultValue={new Date(new Date(card.date).getTime() + 1000 * 60 * 60 * 9)
+            .toISOString()
+            .substring(0, 16)}
           error={errors.date?.message}
           {...register('date', {
             required: { value: true, message: '마감일을 입력해주세요!' },
           })}
         />
 
-        <div className="board-form-pdf-tag-conatiner">
+        <div className="card-form-pdf-tag-conatiner">
           <Form.InputTag id="태그" tags={tags} createTag={createTag} removeTag={removeTag} />
 
           <Form.InputFile
@@ -277,7 +304,7 @@ const BoardCreateForm: React.FC = () => {
             type="file"
             id="PDF"
             hidden
-            replacementName={currentFiles?.[0]?.name}
+            replacementName={currentFiles?.[0]?.name || getPDFName(pdf || '')}
             resetFile={resetFile}
             onChange={e => {
               if (e.target.files?.[0]?.type === 'application/pdf') {
@@ -289,17 +316,17 @@ const BoardCreateForm: React.FC = () => {
           />
         </div>
 
-        <div className="board-form-button-wrapper">
-          <button type="button" className="board-form-cancel-button" onClick={onClose}>
+        <div className="card-form-button-wrapper">
+          <button type="button" className="card-form-cancel-button" onClick={onClose}>
             취소
           </button>
-          <button type="submit" className="board-form-excute-button">
-            생성
+          <button type="submit" className="card-form-excute-button">
+            수정
           </button>
         </div>
       </form>
-    </StyledBoardCreateFormWrapper>
+    </StyledCardUpdateForm>
   );
 };
 
-export default BoardCreateForm;
+export default CardUpdateForm;

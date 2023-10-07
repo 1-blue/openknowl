@@ -1,17 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 
-import { getBoards, getCategories, getPlatforms, getTags, tags } from './dummy';
+import { getBoards, getCards, getCategories, getPlatforms, getTags, tags } from './dummy';
 
 const prisma = new PrismaClient();
 
 async function main() {
   try {
-    // 더미 보드 & 더미 카테고리 & 더미 플랫폼 & 더미 태그 생성
-    await Promise.allSettled([
-      prisma.category.createMany({
-        skipDuplicates: true,
-        data: getCategories(),
-      }),
+    // 더미 카테고리 & 더미 플랫폼 & 더미 태그 생성
+    await Promise.all([
       prisma.platform.createMany({
         skipDuplicates: true,
         data: getPlatforms(),
@@ -22,21 +18,34 @@ async function main() {
       }),
     ]);
 
+    // 더미 보드들 생성
     await prisma.board.createMany({
       skipDuplicates: true,
       data: getBoards(),
     });
 
-    // 총 보드 개수
-    const boardCount = await prisma.board.count();
+    // 더미 카테고리 생성
+    await prisma.category.createMany({
+      skipDuplicates: true,
+      data: getCategories(),
+    });
+
+    // 더미 카드들 생성
+    await prisma.card.createMany({
+      skipDuplicates: true,
+      data: getCards(),
+    });
+
+    // 총 카드 개수
+    const cardCount = await prisma.card.count();
 
     // 랜덤으로 보드와 태그 연결 ( 20 * 4, 중복가능 )
     await Promise.all([
       ...Array(20)
         .fill(null)
         .map(() =>
-          prisma.board.update({
-            where: { idx: Math.floor(Math.random() * boardCount) + 1 },
+          prisma.card.update({
+            where: { idx: Math.floor(Math.random() * cardCount) + 1 },
             data: {
               tags: {
                 connect: {
@@ -46,48 +55,48 @@ async function main() {
             },
           }),
         ),
-      ...Array(20)
-        .fill(null)
-        .map(() =>
-          prisma.board.update({
-            where: { idx: Math.floor(Math.random() * boardCount) + 1 },
-            data: {
-              tags: {
-                connect: {
-                  tag: tags[Math.floor(Math.random() * tags.length)],
-                },
-              },
-            },
-          }),
-        ),
-      ...Array(20)
-        .fill(null)
-        .map(() =>
-          prisma.board.update({
-            where: { idx: Math.floor(Math.random() * boardCount) + 1 },
-            data: {
-              tags: {
-                connect: {
-                  tag: tags[Math.floor(Math.random() * tags.length)],
-                },
-              },
-            },
-          }),
-        ),
-      ...Array(20)
-        .fill(null)
-        .map(() =>
-          prisma.board.update({
-            where: { idx: Math.floor(Math.random() * boardCount) + 1 },
-            data: {
-              tags: {
-                connect: {
-                  tag: tags[Math.floor(Math.random() * tags.length)],
-                },
-              },
-            },
-          }),
-        ),
+      // ...Array(20)
+      //   .fill(null)
+      //   .map(() =>
+      //     prisma.card.update({
+      //       where: { idx: Math.floor(Math.random() * cardCount) + 1 },
+      //       data: {
+      //         tags: {
+      //           connect: {
+      //             tag: tags[Math.floor(Math.random() * tags.length)],
+      //           },
+      //         },
+      //       },
+      //     }),
+      //   ),
+      // ...Array(20)
+      //   .fill(null)
+      //   .map(() =>
+      //     prisma.card.update({
+      //       where: { idx: Math.floor(Math.random() * cardCount) + 1 },
+      //       data: {
+      //         tags: {
+      //           connect: {
+      //             tag: tags[Math.floor(Math.random() * tags.length)],
+      //           },
+      //         },
+      //       },
+      //     }),
+      //   ),
+      // ...Array(20)
+      //   .fill(null)
+      //   .map(() =>
+      //     prisma.card.update({
+      //       where: { idx: Math.floor(Math.random() * cardCount) + 1 },
+      //       data: {
+      //         tags: {
+      //           connect: {
+      //             tag: tags[Math.floor(Math.random() * tags.length)],
+      //           },
+      //         },
+      //       },
+      //     }),
+      //   ),
     ]);
   } catch (error) {
     console.error(error);

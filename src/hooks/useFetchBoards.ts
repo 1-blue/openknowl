@@ -3,8 +3,7 @@ import useSWR from 'swr';
 
 import { buildQueryString } from '@/utils/helper';
 
-import type { ApiFindAllBoardsResponse, ApiMoveBoardRequest } from '@/types/apis';
-import useFetchCategories from './useFetchCategoriesOfBoard';
+import type { ApiFindAllBoardsResponse, ApiMoveCardRequest } from '@/types/apis';
 
 /** 2023/09/19 - 모든 보드들 가져오는 훅 - by 1-blue */
 const useFetchBoards = () => {
@@ -15,40 +14,41 @@ const useFetchBoards = () => {
   const { data, isLoading, error, mutate } = useSWR<ApiFindAllBoardsResponse>(
     buildQueryString('/board', { platform, tag }),
   );
-  const { categories } = useFetchCategories();
 
-  const boardsMutate = ({ idx, category, order }: ApiMoveBoardRequest) =>
+  const boardsMutate = ({
+    idx,
+    sourceBoardIdx,
+    destinationBoardIdx,
+    destinationOrder,
+  }: ApiMoveCardRequest) =>
     mutate<ApiFindAllBoardsResponse>(
-      currentData => {
-        if (!categories) return currentData!;
-        if (!currentData) return currentData!;
-        if (!currentData?.data) return currentData;
-        if (!Array.isArray(currentData.data?.[0])) return currentData;
+      currentBoards => {
+        if (!currentBoards) return currentBoards!;
+        if (!currentBoards?.data) return currentBoards;
 
-        /** 수정할 복사본 */
-        const copyData = [...currentData.data.map(v => [...v])];
-        let targetIndex = -1;
-        let targetIdx = -1;
-        const categoryIndex = categories.findIndex(v => v.category === category);
+        // 얕은 복사본 생성
+        const copyBoards = JSON.parse(
+          JSON.stringify(currentBoards.data),
+        ) as typeof currentBoards.data;
 
-        copyData.forEach((boards, index) =>
-          boards.forEach((board, i) => {
-            if (board.idx === idx) {
-              targetIndex = index;
-              targetIdx = i;
-            }
-          }),
+        // 이동할 카드 잘라내기
+        const targetBoardIndex = copyBoards.findIndex(board => board.idx === sourceBoardIdx);
+        const targetCardIndex = copyBoards[targetBoardIndex].cards.findIndex(
+          card => card.idx === idx,
         );
+        const [target] = copyBoards[targetBoardIndex].cards.splice(targetCardIndex, 1);
 
-        const [target] = copyData[targetIndex].splice(targetIdx, 1);
-        copyData[categoryIndex].splice(order, 0, target);
+        // 이동할 카드 붙여넣기
+        copyBoards
+          .find(board => board.idx === destinationBoardIdx)
+          ?.cards.splice(destinationOrder, 0, target);
 
-        return { ...currentData, data: copyData };
+        return { ...currentBoards, data: copyBoards };
       },
       { revalidate: false },
     );
 
-  return { boardsGroup: data?.data, isLoading, error, boardsMutate };
+  return { boards: data?.data, isLoading, error, boardsMutate };
 };
 
 export default useFetchBoards;

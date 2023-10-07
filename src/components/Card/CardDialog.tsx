@@ -5,7 +5,7 @@ import useOuterClick from '@/hooks/useOuterClick';
 
 import { getPDFName } from '@/utils/board';
 
-const StyledBoardDialog = styled.aside`
+const StyledCardDialog = styled.aside`
   padding: 0.2em;
   width: 120px;
   position: absolute;
@@ -21,7 +21,7 @@ const StyledBoardDialog = styled.aside`
   overflow: hidden;
   z-index: 1;
 
-  & > .dialog-button {
+  & > .card-dialog-button {
     padding: 0.6em;
     text-align: center;
 
@@ -37,13 +37,13 @@ const StyledBoardDialog = styled.aside`
   }
 `;
 
-interface BoardDialogProps {
+interface CardDialogProps {
   onClose: () => void;
   pdfURL?: string | null;
 }
 
-/** 2023/09/20 - Board Dialog - by 1-blue */
-const BoardDialog: React.FC<BoardDialogProps> = ({ onClose, pdfURL }) => {
+/** 2023/09/20 - Card Dialog - by 1-blue */
+const CardDialog: React.FC<CardDialogProps> = ({ onClose, pdfURL }) => {
   const dialogRef = useOuterClick(onClose);
 
   /** 2023/09/25 - PDF 다운로드 - by 1-blue */
@@ -65,25 +65,25 @@ const BoardDialog: React.FC<BoardDialogProps> = ({ onClose, pdfURL }) => {
   };
 
   return (
-    <StyledBoardDialog ref={dialogRef}>
-      <button type="button" className="dialog-button" data-type="update">
+    <StyledCardDialog ref={dialogRef}>
+      <button type="button" className="card-dialog-button" data-type="update">
         수정
       </button>
-      <button type="button" className="dialog-button" data-type="delete">
+      <button type="button" className="card-dialog-button" data-type="delete">
         삭제
       </button>
       {pdfURL && (
         <>
-          <Link className="dialog-button" href={pdfURL} target="_blank">
+          <Link className="card-dialog-button" href={pdfURL} target="_blank">
             PDF 보기
           </Link>
-          <button type="button" className="dialog-button" onClick={handlePDFDownload}>
+          <button type="button" className="card-dialog-button" onClick={handlePDFDownload}>
             PDF 다운로드
           </button>
         </>
       )}
-    </StyledBoardDialog>
+    </StyledCardDialog>
   );
 };
 
-export default BoardDialog;
+export default CardDialog;

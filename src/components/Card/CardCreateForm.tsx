@@ -1,29 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { IoCloseCircle } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { useSWRConfig } from 'swr';
 
-import { apiUpdateBoard, apiUploadPDF } from '@/apis';
+import { apiCreateCard, apiUploadPDF } from '@/apis';
 
-import { getPDFName } from '@/utils/board';
-
-import useFetchCategories from '@/hooks/useFetchCategoriesOfBoard';
-import useFetchPlatforms from '@/hooks/useFetchPlatformsOfBoard';
-import useFetchBoard from '@/hooks/useFetchBoard';
+import useFetchCategories from '@/hooks/useFetchCategories';
+import useFetchPlatforms from '@/hooks/useFetchPlatforms';
 import useOuterClick from '@/hooks/useOuterClick';
 
 import { useAppDispatch, useAppSelector } from '@/store';
-import { closeBoardForm } from '@/store/slices/board';
+import { closeCardForm } from '@/store/slices/card';
 import { startSpinner, stopSpinner } from '@/store/slices/spinner';
 
 import Form from '@/components/common/Form';
-import Skeleton from '@/components/common/Skeleton';
 
-import type { Board } from '@prisma/client';
+import type { Card } from '@prisma/client';
 
-const StyledBoardUpdateFormWrapper = styled.article`
+const StyledCardCreateForm = styled.article`
   position: relative;
 
   & > .board-form-close-button {
@@ -108,17 +104,18 @@ const StyledBoardUpdateFormWrapper = styled.article`
   }
 `;
 
-interface BoardUpdateForm extends Pick<Board, 'name' | 'date'> {
+interface CardCreateFormType extends Pick<Card, 'name' | 'date'> {
   files?: File[];
 }
 
-/** 2023/09/20 - Modal BoardUpdateForm Component - by 1-blue */
-const BoardUpdateForm: React.FC = () => {
+/** 2023/09/20 - Modal CardCreateForm Component - by 1-blue */
+const CardCreateForm: React.FC = () => {
   const { mutate } = useSWRConfig();
   const dispatch = useAppDispatch();
-  const { targetIdx } = useAppSelector(state => state.board);
+  const {
+    createState: { defaultCategory, pdfFile },
+  } = useAppSelector(state => state.card);
 
-  const { board } = useFetchBoard({ idx: targetIdx });
   const { categories } = useFetchCategories();
   const { platforms } = useFetchPlatforms();
 
@@ -129,16 +126,14 @@ const BoardUpdateForm: React.FC = () => {
     formState: { errors },
     watch,
     setValue,
-  } = useForm<BoardUpdateForm>();
+  } = useForm<CardCreateFormType>({ defaultValues: { files: [pdfFile] } });
 
   // category
-  const [category, setCategory] = useState(categories?.[0].category || '신규');
+  const [category, setCategory] = useState(defaultCategory || categories?.[0].category || '신규');
   // platform
   const [platform, setPlatform] = useState(platforms?.[0].platform || '미니인턴');
   // tags
   const [tags, setTags] = useState<string[]>([]);
-  // pdf
-  const [pdf, setPDF] = useState<string | null>(null);
 
   /** 2023/09/21 - 태그 생성 - by 1-blue */
   const createTag = (tag: string) => {
@@ -153,8 +148,8 @@ const BoardUpdateForm: React.FC = () => {
     setTags(prev => prev.filter(v => v !== tag));
   };
 
-  /** 2023/09/21 - 보드 수정 요청 핸들러 - by 1-blue */
-  const updateBoard: React.FormEventHandler = handleSubmit(async ({ name, date, files }) => {
+  /** 2023/09/21 - 카드 생성 요청 핸들러 - by 1-blue */
+  const createCard: React.FormEventHandler = handleSubmit(async ({ name, date, files }) => {
     let pdfURL: string | null = null;
 
     // 1. 이미지 업로드
@@ -168,83 +163,68 @@ const BoardUpdateForm: React.FC = () => {
       }
     }
 
-    apiUpdateBoard({
-      idx: targetIdx,
+    // 2. 카드 생성
+    apiCreateCard({
       name,
       date,
-      category,
+      pdf: pdfURL,
       platform,
       tags,
-      pdf: pdfURL || pdf,
+      category,
     })
       .then(({ message }) => {
         toast.success(message);
         mutate('/board');
 
         dispatch(stopSpinner());
-        dispatch(closeBoardForm());
+        dispatch(closeCardForm());
       })
-      // FIXME:
       .catch(console.error);
   });
-
-  useEffect(() => {
-    if (!board) return;
-
-    setCategory(board.category.category);
-    setPlatform(board.platform.platform);
-    setTags(board.tags.map(({ tag }) => tag));
-    setPDF(board.pdf);
-  }, [board]);
 
   const currentFiles = watch('files');
   const resetFile = () => {
     setValue('files', undefined);
-    setPDF(null);
   };
 
   const onClose = () => {
-    if (!confirm('폼을 닫으면 수정하신 내용이 저장되지 않습니다.')) return;
+    if (!confirm('폼을 닫으면 작성하신 내용이 저장되지 않습니다.')) return;
 
-    dispatch(closeBoardForm());
+    dispatch(closeCardForm());
   };
 
   const formRef = useOuterClick(onClose);
 
-  if (!board) {
-    return <Skeleton.BoardDetail />;
-  }
-
   return (
-    <StyledBoardUpdateFormWrapper ref={formRef}>
+    <StyledCardCreateForm ref={formRef}>
       <IoCloseCircle role="button" className="board-form-close-button" onClick={onClose} />
 
-      <h6 className="board-form-title">보드 수정</h6>
+      <h6 className="board-form-title">카드 생성</h6>
 
-      <form onSubmit={updateBoard} className="board-form">
+      <form onSubmit={createCard} className="board-form">
         <Form.Input
           autoFocus
           type="text"
           id="이름"
           placeholder="ex) 김인턴"
           required
-          defaultValue={board.name}
           error={errors.name?.message}
+          defaultValue={process.env['NODE_ENV'] === 'development' ? '테스트' : ''}
           {...register('name', {
             required: { value: true, message: '이름을 입력해주세요!' },
             minLength: { value: 2, message: '최소 2자를 입력해주세요!' },
             maxLength: { value: 12, message: '최대 12자를 입력해주세요!' },
           })}
         />
-
         {categories && (
           <Form.Combobox
             id="카테고리"
             required
             defaultValue={{
-              value: board.category.category,
-              label: board.category.category,
+              value: defaultCategory || categories?.[0].category || '신규',
+              label: defaultCategory || categories?.[0].category || '신규',
             }}
+            value={{ value: category, label: category }}
             options={categories.map(({ category }) => ({
               label: category,
               value: category,
@@ -264,10 +244,11 @@ const BoardUpdateForm: React.FC = () => {
             required
             defaultValue={[
               {
-                label: board.platform.platform,
-                value: board.platform.platform,
+                label: platforms?.[0].platform || '미니인턴',
+                value: platforms?.[0].platform || '미니인턴',
               },
             ]}
+            value={{ value: platform, label: platform }}
             options={platforms.map(({ platform }) => ({
               label: platform,
               value: platform,
@@ -285,9 +266,7 @@ const BoardUpdateForm: React.FC = () => {
           type="datetime-local"
           id="마감일"
           required
-          defaultValue={new Date(new Date(board.date).getTime() + 1000 * 60 * 60 * 9)
-            .toISOString()
-            .substring(0, 16)}
+          defaultValue={new Date(Date.now() + 1000 * 60 * 60 * 9).toISOString().substring(0, 16)}
           error={errors.date?.message}
           {...register('date', {
             required: { value: true, message: '마감일을 입력해주세요!' },
@@ -302,7 +281,7 @@ const BoardUpdateForm: React.FC = () => {
             type="file"
             id="PDF"
             hidden
-            replacementName={currentFiles?.[0]?.name || getPDFName(pdf || '')}
+            replacementName={currentFiles?.[0]?.name}
             resetFile={resetFile}
             onChange={e => {
               if (e.target.files?.[0]?.type === 'application/pdf') {
@@ -319,12 +298,12 @@ const BoardUpdateForm: React.FC = () => {
             취소
           </button>
           <button type="submit" className="board-form-excute-button">
-            수정
+            생성
           </button>
         </div>
       </form>
-    </StyledBoardUpdateFormWrapper>
+    </StyledCardCreateForm>
   );
 };
 
-export default BoardUpdateForm;
+export default CardCreateForm;

@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { Override } from '@/types';
 import type { ApiCreatePresignedURLRequest, ApiCreatePresignedURLResponse } from '@/types/apis';
 
+// TODO: swagger
 const handler = async (
   req: Override<NextApiRequest, { body: ApiCreatePresignedURLRequest }>,
   res: NextApiResponse<ApiCreatePresignedURLResponse>,

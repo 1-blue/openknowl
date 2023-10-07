@@ -11,33 +11,51 @@ model Board {
   idx Int @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  order Int
+
+  // 보드와 카드 ( 1 : N )
+  cards Card[]
+
+  // 보드와 카테고리 ( 1 : 1 )
+  category Category?
+}
+
+model Card {
+  idx Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   name String
   date DateTime
   order Int
   pdf String?
 
-  category Category @relation(fields: [categoryIdx], references: [idx], onUpdate: Cascade, onDelete: Cascade)
-  categoryIdx Int
-  platform Platform @relation(fields: [platformIdx], references: [idx], onUpdate: Cascade, onDelete: Cascade)
-  platformIdx Int
+  // 보드와 카드 ( 1 : N )
+  board Board @relation(fields: [boardIdx], references: [idx], onUpdate: Cascade, onDelete: Cascade)
+  boardIdx Int
+
+  // 카드와 플랫폼 ( 1 : N )
+  platform Platform @relation(fields: [platformIdx], references: [platform], onUpdate: Cascade, onDelete: Cascade)
+  platformIdx String
+
+  // 카드와 태그 ( N : M )
   tags Tag[]
 }
 
 model Category {
-  idx Int @id @default(autoincrement())
-  category String @unique
+  category String @id
 
-  boards Board[]
+  board Board @relation(fields: [boardIdx], references: [idx], onUpdate: Cascade, onDelete: Cascade)
+  boardIdx Int @unique
 }
 model Platform {
-  idx Int @id @default(autoincrement())
-  platform String @unique
+  platform String @id
 
-  boards Board[]
+  // 카드와 플랫폼 ( 1 : N )
+  cards Card[]
 }
 model Tag {
-  idx Int @id @default(autoincrement())
-  tag String @unique
+  tag String @id
 
-  boards Board[]
+  // 카드와 태그 ( N : M )
+  cards Card[]
 }

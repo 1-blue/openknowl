@@ -1,11 +1,11 @@
 import { platformService } from '@/apis/services/platform';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import type { ApiFindAllPlatformsOfBoardResponse } from '@/types/apis';
+import type { ApiFindAllPlatformsOfCardResponse } from '@/types/apis';
 
 /**
  * @swagger
- * /api/board/platform:
+ * /api/platform:
  *  get:
  *    summary: 등록된 모든 플랫폼 요청
  *    description: 등록된 모든 플랫폼 요청
@@ -15,7 +15,7 @@ import type { ApiFindAllPlatformsOfBoardResponse } from '@/types/apis';
  */
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<ApiFindAllPlatformsOfBoardResponse>,
+  res: NextApiResponse<ApiFindAllPlatformsOfCardResponse>,
 ) => {
   const { method } = req;
 

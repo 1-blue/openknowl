@@ -2,9 +2,9 @@ import Link from 'next/link';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '@/store';
-import { closeBoardDetail } from '@/store/slices/board';
+import { closeCardDetail } from '@/store/slices/card';
 
-import useFetchBoard from '@/hooks/useFetchBoard';
+import useFetchCard from '@/hooks/useFetchCard';
 import useOuterClick from '@/hooks/useOuterClick';
 
 import { getPDFName } from '@/utils/board';
@@ -14,7 +14,7 @@ import Skeleton from '@/components/common/Skeleton';
 import Overlay from '@/components/common/Overlay';
 import Custom500 from '@/pages/500';
 
-const StyledBoardDetail = styled.ul`
+const StyledCardDetail = styled.ul`
   position: relative;
   display: flex;
   flex-flow: column nowrap;
@@ -24,7 +24,7 @@ const StyledBoardDetail = styled.ul`
     margin-top: 1em;
   }
 
-  & .board-detail-title {
+  & .card-detail-title {
     padding: 1em 1.6em;
     text-align: center;
 
@@ -35,7 +35,7 @@ const StyledBoardDetail = styled.ul`
     color: #fff;
   }
 
-  & .board-detail-list {
+  & .card-detail-list {
     display: flex;
 
     & > * + * {
@@ -43,30 +43,30 @@ const StyledBoardDetail = styled.ul`
     }
   }
 
-  & .board-detail-list-left,
-  .board-detail-list-right {
+  & .card-detail-list-left,
+  .card-detail-list-right {
     display: inline-block;
     padding: 0.6em;
   }
-  & .board-detail-list-left {
+  & .card-detail-list-left {
     width: 80px;
 
     color: ${({ theme }) => theme.colors.blue500};
     background-color: ${({ theme }) => theme.colors.blue100};
     border-radius: 0.2em;
   }
-  & .board-detail-list-right {
+  & .card-detail-list-right {
     flex: 1;
     color: ${({ theme }) => theme.colors.gray500};
     background-color: ${({ theme }) => theme.colors.gray200};
     border-radius: 0.2em;
   }
-  & .board-detail-tag-container {
+  & .card-detail-tag-container {
     display: flex;
     flex-flow: row wrap;
     gap: 0.4em 0.8em;
   }
-  & .board-detail-tag {
+  & .card-detail-tag {
     padding: 0.3em 0.5em;
     border-radius: 0.3em;
     border: 1.5px solid ${({ theme }) => theme.colors.gray400};
@@ -74,7 +74,7 @@ const StyledBoardDetail = styled.ul`
     color: ${({ theme }) => theme.colors.gray500};
   }
 
-  & .board-pdf-function-button-container {
+  & .card-pdf-function-button-container {
     text-align: right;
     margin-top: 0.1em;
 
@@ -90,7 +90,7 @@ const StyledBoardDetail = styled.ul`
     }
   }
 
-  & .board-detail-close-button {
+  & .card-detail-close-button {
     position: absolute;
     top: 0.9em;
     left: 0.6em;
@@ -108,31 +108,31 @@ const StyledBoardDetail = styled.ul`
   }
 `;
 
-/** 2023/09/25 - Board Detail Component - by 1-blue */
-const BoardDetail: React.FC = () => {
+/** 2023/09/25 - Card Detail Component - by 1-blue */
+const CardDetail: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { targetIdx } = useAppSelector(state => state.board);
-  const { board, isLoading, error } = useFetchBoard({ idx: targetIdx });
+  const { targetIdx } = useAppSelector(state => state.card);
+  const { card, isLoading, error } = useFetchCard({ idx: targetIdx });
 
   /** 2023/09/25 - PDF 다운로드 - by 1-blue */
   const handlePDFDownload = async () => {
-    if (!board?.pdf) return;
+    if (!card?.pdf) return;
 
-    const response = await fetch(board.pdf);
+    const response = await fetch(card.pdf);
     const file = await response.blob();
 
     const downloadUrl = window.URL.createObjectURL(file); // 해당 file을 가리키는 url 생성
     const anchorElement = document.createElement('a');
 
     document.body.appendChild(anchorElement);
-    anchorElement.download = getPDFName(board.pdf);
+    anchorElement.download = getPDFName(card.pdf);
     anchorElement.href = downloadUrl;
     anchorElement.click();
     document.body.removeChild(anchorElement);
     window.URL.revokeObjectURL(downloadUrl);
   };
 
-  const modalRef = useOuterClick<HTMLUListElement>(() => dispatch(closeBoardDetail()));
+  const modalRef = useOuterClick<HTMLUListElement>(() => dispatch(closeCardDetail()));
 
   if (error) {
     return <Custom500 />;
@@ -144,50 +144,51 @@ const BoardDetail: React.FC = () => {
       </Overlay>
     );
   }
-  if (!board) return <></>;
+  if (!card) return <></>;
 
   return (
-    <StyledBoardDetail ref={modalRef}>
-      <h6 className="board-detail-title">{board.name}</h6>
-      <li className="board-detail-list">
-        <span className="board-detail-list-left">이름</span>
-        <span className="board-detail-list-right">{board.name}</span>
+    <StyledCardDetail ref={modalRef}>
+      <h6 className="card-detail-title">{card.name}</h6>
+      <li className="card-detail-list">
+        <span className="card-detail-list-left">이름</span>
+        <span className="card-detail-list-right">{card.name}</span>
       </li>
-      <li className="board-detail-list">
-        <span className="board-detail-list-left">카테고리</span>
-        <span className="board-detail-list-right">{board.category.category}</span>
+      <li className="card-detail-list">
+        <span className="card-detail-list-left">카테고리</span>
+        {/* TODO: */}
+        {/* <span className="card-detail-list-right">{card.category.category}</span> */}
       </li>
-      <li className="board-detail-list">
-        <span className="board-detail-list-left">플랫폼</span>
-        <span className="board-detail-list-right">{board.platform.platform}</span>
+      <li className="card-detail-list">
+        <span className="card-detail-list-left">플랫폼</span>
+        <span className="card-detail-list-right">{card.platform.platform}</span>
       </li>
-      <li className="board-detail-list">
-        <span className="board-detail-list-left">남은 기간</span>
-        <time className="board-detail-list-right">
-          {Date.now() - new Date(board.date).getTime() > 0
-            ? `${pastTimeFormat(board.date)} 지남`
-            : `${futureTimeFormat(board.date)} 전`}
+      <li className="card-detail-list">
+        <span className="card-detail-list-left">남은 기간</span>
+        <time className="card-detail-list-right">
+          {Date.now() - new Date(card.date).getTime() > 0
+            ? `${pastTimeFormat(card.date)} 지남`
+            : `${futureTimeFormat(card.date)} 전`}
         </time>
       </li>
-      <li className="board-detail-list">
-        <span className="board-detail-list-left">태그들</span>
-        <ul className="board-detail-list-right board-detail-tag-container">
-          {board.tags.map(({ tag }) => (
-            <li key={tag} className="board-detail-tag">
+      <li className="card-detail-list">
+        <span className="card-detail-list-left">태그들</span>
+        <ul className="card-detail-list-right card-detail-tag-container">
+          {card.tags.map(({ tag }) => (
+            <li key={tag} className="card-detail-tag">
               {tag}
             </li>
           ))}
         </ul>
       </li>
-      {board.pdf && (
+      {card.pdf && (
         <>
-          <li className="board-detail-list">
-            <span className="board-detail-list-left">이력서</span>
-            <time className="board-detail-list-right">{getPDFName(board.pdf)}</time>
+          <li className="card-detail-list">
+            <span className="card-detail-list-left">이력서</span>
+            <time className="card-detail-list-right">{getPDFName(card.pdf)}</time>
           </li>
 
-          <div className="board-pdf-function-button-container">
-            <Link href={board.pdf} target="_blank">
+          <div className="card-pdf-function-button-container">
+            <Link href={card.pdf} target="_blank">
               PDF 보기
             </Link>
             <button type="button" onClick={handlePDFDownload}>
@@ -196,8 +197,8 @@ const BoardDetail: React.FC = () => {
           </div>
         </>
       )}
-    </StyledBoardDetail>
+    </StyledCardDetail>
   );
 };
 
-export default BoardDetail;
+export default CardDetail;

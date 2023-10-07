@@ -17,7 +17,6 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   button[type="button"] {
-    background-color: transparent;
     border: 0px solid transparent;
     cursor: pointer;
   }
