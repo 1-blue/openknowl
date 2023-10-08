@@ -18,7 +18,11 @@ const StyledGeneralLayout = styled.div``;
 /** 2023/09/18 - 일반 레이아웃 component - by 1-blue */
 const GeneralLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { isStartSpinner } = useAppSelector(state => state.spinner);
-  const { isShowCardForm, targetIdx, isShowCardDetail } = useAppSelector(state => state.card);
+  const {
+    isShowCardForm,
+    updateState: { targetIdx },
+    isShowCardDetail,
+  } = useAppSelector(state => state.card);
 
   return (
     <StyledGeneralLayout>

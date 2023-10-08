@@ -1,23 +1,21 @@
 import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useSWRConfig } from 'swr';
 import { IoEllipsisVerticalSharp } from 'react-icons/io5';
 import styled from 'styled-components';
 
 import useToggle from '@/hooks/useToggle';
+import useFetchBoards from '@/hooks/useFetchBoards';
 
 import { apiDeleteBoard, apiUpdateBoard } from '@/apis/board';
 
 import Dialog from '@/components/common/Dialog';
-
-import type { ApiFindAllBoardsResponse } from '@/types/apis';
 
 const StyledBoardHeader = styled.form`
   position: relative;
   display: flex;
   align-items: center;
 
-  margin-bottom: 1em;
+  margin-bottom: 0.4em;
 
   & > * + * {
     margin-left: 0.4em;
@@ -30,14 +28,15 @@ const StyledBoardHeader = styled.form`
     cursor: pointer;
   }
   & .board-name-button {
-    width: 100%;
-    padding: 0.5em 0.6em;
+    padding: 0.5em 0.8em;
     text-align: left;
 
     letter-spacing: 1.5px;
     font-size: ${({ theme }) => theme.fontSize.xs};
     font-weight: bold;
-    background-color: transparent;
+    border-radius: 0.2em;
+    background-color: ${({ theme }) => theme.colors.main400};
+    color: #fff;
   }
   & .board-name-input {
     padding: 0.5em 0.6em;
@@ -58,7 +57,7 @@ const StyledBoardHeader = styled.form`
     width: 28px;
     height: 28px;
     padding: 0.4em;
-    margin-left: 1em;
+    margin-left: auto;
 
     border-radius: 50%;
     color: ${({ theme }) => theme.colors.gray600};
@@ -78,7 +77,7 @@ interface BoardHeaderProps {
 
 /** 2023/10/06 - Board Header Component - by 1-blue */
 const BoardHeader: React.FC<BoardHeaderProps> = ({ idx, currentCategory }) => {
-  const { mutate } = useSWRConfig();
+  const { boardsMutate } = useFetchBoards();
   const { isOpen, onOpen, onClose } = useToggle(false);
   const [category, setCategory] = useState(currentCategory);
   const [isInputting, setIsInputting] = useState(false);
@@ -105,16 +104,14 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ idx, currentCategory }) => {
       }
 
       // 보드 제거
-      mutate<ApiFindAllBoardsResponse, ApiFindAllBoardsResponse>(
-        '/board',
+      boardsMutate(
         boards => boards && { ...boards, data: boards?.data?.filter(board => board.idx !== idx) },
-        { revalidate: false },
       );
       apiDeleteBoard({ idx });
     }
   };
 
-  /** 2023/10/07 - 보드 카테고리 수정 - by 1-blue */
+  /** 2023/10/07 - 보드 수정 - by 1-blue */
   const onUpdateBoard: React.FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
 
@@ -123,14 +120,13 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ idx, currentCategory }) => {
     apiUpdateBoard({ idx, currentCategory, category }).then(({ data }) => {
       if (!data) return;
 
-      mutate<ApiFindAllBoardsResponse, ApiFindAllBoardsResponse>(
-        '/board',
+      // 보드 수정
+      boardsMutate(
         boards =>
           boards && {
             ...boards,
             data: boards.data?.map(board => (board.idx === data.idx ? data : board)),
           },
-        { revalidate: false },
       );
 
       inputRef.current?.blur();

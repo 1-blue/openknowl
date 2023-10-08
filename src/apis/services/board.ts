@@ -27,7 +27,7 @@ export const boardService = {
       orderBy: { order: 'asc' },
       include: {
         cards: {
-          include: { platform: true, tags: true },
+          include: { platform: true, tags: true, board: true },
           where: { ...where.where },
           orderBy: { order: 'asc' },
         },
@@ -52,7 +52,10 @@ export const boardService = {
   async delete({ idx }: ApiDeleteBoardRequest) {
     const deletedBoard = await prisma.board.delete({ where: { idx } });
 
-    // TODO: 순서 값 조정 필요
+    await prisma.board.updateMany({
+      where: { order: { gt: deletedBoard.order } },
+      data: { order: { decrement: 1 } },
+    });
 
     return deletedBoard;
   },
@@ -68,7 +71,7 @@ export const boardService = {
 
     const createdBoard = await prisma.board.create({
       data: { category, order: count },
-      include: { cards: { include: { platform: true, tags: true } } },
+      include: { cards: { include: { platform: true, tags: true, board: true } } },
     });
 
     return createdBoard;

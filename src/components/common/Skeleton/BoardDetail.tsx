@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Square from './Square';
 
 const StyledBoardDetail = styled.div`
+  min-width: 480px;
   padding: 2em;
 
   background-color: white;
@@ -36,7 +37,7 @@ const BoardDetail: React.FC = () => {
           .map((_, i) => (
             <li key={i} className="board-detail-skeleton-wrapper">
               <Square width="80px" height="40px" />
-              <Square width="300px" height="40px" />
+              <Square width="100%" height="40px" />
             </li>
           ))}
       </ul>

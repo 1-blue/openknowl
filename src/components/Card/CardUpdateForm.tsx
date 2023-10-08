@@ -7,7 +7,7 @@ import { useSWRConfig } from 'swr';
 
 import { apiUpdateCard, apiUploadPDF } from '@/apis';
 
-import { getPDFName } from '@/utils/board';
+import { getPDFName } from '@/utils';
 
 import useFetchCategories from '@/hooks/useFetchCategories';
 import useFetchPlatforms from '@/hooks/useFetchPlatforms';
@@ -116,7 +116,7 @@ interface CardUpdateFormType extends Pick<Card, 'name' | 'date'> {
 const CardUpdateForm: React.FC = () => {
   const { mutate } = useSWRConfig();
   const dispatch = useAppDispatch();
-  const { targetIdx } = useAppSelector(state => state.card);
+  const { targetIdx } = useAppSelector(state => state.card.updateState);
 
   const { card } = useFetchCard({ idx: targetIdx });
   const { categories } = useFetchCategories();
@@ -179,20 +179,19 @@ const CardUpdateForm: React.FC = () => {
     })
       .then(({ message }) => {
         toast.success(message);
-        mutate('/card');
+
+        mutate('/board');
 
         dispatch(stopSpinner());
         dispatch(closeCardForm());
       })
-      // FIXME:
       .catch(console.error);
   });
 
   useEffect(() => {
     if (!card) return;
 
-    // TODO:
-    // setCategory(card.category.category);
+    setCategory(card.board.category);
     setPlatform(card.platform.platform);
     setTags(card.tags.map(({ tag }) => tag));
     setPDF(card.pdf);
@@ -241,11 +240,8 @@ const CardUpdateForm: React.FC = () => {
             id="카테고리"
             required
             defaultValue={{
-              // TODO:
-              value: '임시',
-              label: '임시',
-              // value: card.category.category,
-              // label: card.category.category,
+              value: card.board.category,
+              label: card.board.category,
             }}
             options={categories.map(category => ({
               label: category,

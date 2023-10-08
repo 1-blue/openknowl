@@ -2,31 +2,40 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface CardState {
+  /** 카드 생성 폼을 보여줄지 여부 */
+  isShowCardForm: boolean;
+  /** 카드 상세 보기 모달을 보여줄지 여부 */
+  isShowCardDetail: boolean;
+
   createState: {
     /** 카드가 생성될 보드의 기본 카테고리 */
     defaultCategory: string;
     /** Drag & Drop으로 PDF를 업로드하는 경우 나머지 내용을 작성하는 동안 저장될 파일 */
     pdfFile?: File;
   };
-
-  /** 카드 생성 폼을 보여줄지 여부 */
-  isShowCardForm: boolean;
-  /** 수정인 경우 수정할 카드의 식별자 */
-  targetIdx: number;
-
-  /** 카드 상세 보기 모달을 보여줄지 여부 */
-  isShowCardDetail: boolean;
+  updateState: {
+    /** 수정할 카드의 식별자 */
+    targetIdx: number;
+  };
+  detailState: {
+    /** 상세 보기를 할 카드의 식별자 */
+    targetIdx: number;
+  };
 }
 
 const initialState: CardState = {
+  isShowCardForm: false,
+  isShowCardDetail: false,
+
   createState: {
     defaultCategory: '',
   },
-
-  isShowCardForm: false,
-  targetIdx: -1,
-
-  isShowCardDetail: false,
+  updateState: {
+    targetIdx: -1,
+  },
+  detailState: {
+    targetIdx: -1,
+  },
 };
 
 export const cardSlice = createSlice({
@@ -43,41 +52,26 @@ export const cardSlice = createSlice({
       state.isShowCardForm = true;
       state.createState.pdfFile = action.payload.pdfFile;
     },
-    openCardForm: (
-      state,
-      action: PayloadAction<{
-        idx?: number;
-        targetBoardIdx?: number;
-        defaultCategory?: string;
-        pdfFile?: File;
-      }>,
-    ) => {
+    /** 카드 수정 폼 열기 */
+    openUpdateCardForm: (state, action: PayloadAction<{ targetIdx: number }>) => {
       state.isShowCardForm = true;
-
-      // "Drag & Drop"으로 카드를 생성하는 경우
-      if (action.payload.pdfFile) {
-        state.createState.pdfFile = action.payload.pdfFile;
-      }
-
-      if (action.payload.idx) {
-        state.targetIdx = action.payload.idx;
-      }
+      state.updateState.targetIdx = action.payload.targetIdx;
     },
+    /** 카드 생성 & 수정 폼 닫기 */
     closeCardForm: state => {
       state.isShowCardForm = false;
-      state.targetIdx = -1;
-      state.createState = {
-        defaultCategory: '',
-      };
+      state.createState = { defaultCategory: '' };
+      state.updateState = { targetIdx: -1 };
     },
-
+    /** 카드 상세 보기 모달 열기 */
     openCardDetail: (state, action: PayloadAction<{ targetIdx: number }>) => {
       state.isShowCardDetail = true;
-      state.targetIdx = action.payload.targetIdx;
+      state.detailState.targetIdx = action.payload.targetIdx;
     },
+    /** 카드 상세 보기 모달 닫기 */
     closeCardDetail: state => {
       state.isShowCardDetail = false;
-      state.targetIdx = -1;
+      state.detailState.targetIdx = -1;
     },
   },
 });
@@ -85,6 +79,7 @@ export const cardSlice = createSlice({
 export const {
   openCreateCardForm,
   openCreateCardFormByPDF,
+  openUpdateCardForm,
   closeCardForm,
   openCardDetail,
   closeCardDetail,

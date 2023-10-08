@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useSWRConfig } from 'swr';
 import styled from 'styled-components';
 import { IoAdd } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 
 import { apiCreateBoard } from '@/apis/board';
 
-import type { ApiFindAllBoardsResponse } from '@/types/apis';
+import useFetchBoards from '@/hooks/useFetchBoards';
 
 const StyledBoardCreateForm = styled.form`
   place-self: start;
@@ -71,7 +70,7 @@ type BoardCreateFormState = 'waiting' | 'inputting';
 
 /** 2023/10/06 - Board Create Button Component - by 1-blue */
 const BoardCreateForm: React.FC = () => {
-  const { mutate } = useSWRConfig();
+  const { boardsMutate } = useFetchBoards();
   const [state, setState] = useState<BoardCreateFormState>('waiting');
   const [category, setCategory] = useState('');
 
@@ -84,8 +83,7 @@ const BoardCreateForm: React.FC = () => {
     apiCreateBoard({ category }).then(({ data }) => {
       if (!data) return;
 
-      mutate<ApiFindAllBoardsResponse, ApiFindAllBoardsResponse>(
-        '/board',
+      boardsMutate(
         boards =>
           boards && {
             ...boards,

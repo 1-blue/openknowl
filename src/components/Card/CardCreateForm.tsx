@@ -3,13 +3,13 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { IoCloseCircle } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import { useSWRConfig } from 'swr';
 
 import { apiCreateCard, apiUploadPDF } from '@/apis';
 
 import useFetchCategories from '@/hooks/useFetchCategories';
 import useFetchPlatforms from '@/hooks/useFetchPlatforms';
 import useOuterClick from '@/hooks/useOuterClick';
+import useFetchBoards from '@/hooks/useFetchBoards';
 
 import { useAppDispatch, useAppSelector } from '@/store';
 import { closeCardForm } from '@/store/slices/card';
@@ -110,7 +110,7 @@ interface CardCreateFormType extends Pick<Card, 'name' | 'date'> {
 
 /** 2023/09/20 - Modal CardCreateForm Component - by 1-blue */
 const CardCreateForm: React.FC = () => {
-  const { mutate } = useSWRConfig();
+  const { boardsMutate } = useFetchBoards();
   const dispatch = useAppDispatch();
   const {
     createState: { defaultCategory, pdfFile },
@@ -129,7 +129,7 @@ const CardCreateForm: React.FC = () => {
   } = useForm<CardCreateFormType>({ defaultValues: { files: [pdfFile] } });
 
   // category
-  const [category, setCategory] = useState(defaultCategory || categories?.[0].category || '신규');
+  const [category, setCategory] = useState(defaultCategory || categories?.[0] || '신규');
   // platform
   const [platform, setPlatform] = useState(platforms?.[0].platform || '미니인턴');
   // tags
@@ -172,9 +172,19 @@ const CardCreateForm: React.FC = () => {
       tags,
       category,
     })
-      .then(({ message }) => {
+      .then(({ message, data }) => {
+        if (!data) return;
+
         toast.success(message);
-        mutate('/board');
+
+        boardsMutate(boards => {
+          return {
+            ...boards,
+            data: boards?.data?.map(board =>
+              board.idx === data.boardIdx ? { ...board, cards: [...board.cards, data] } : board,
+            ),
+          };
+        });
 
         dispatch(stopSpinner());
         dispatch(closeCardForm());
@@ -183,9 +193,7 @@ const CardCreateForm: React.FC = () => {
   });
 
   const currentFiles = watch('files');
-  const resetFile = () => {
-    setValue('files', undefined);
-  };
+  const resetFile = () => setValue('files', undefined);
 
   const onClose = () => {
     if (!confirm('폼을 닫으면 작성하신 내용이 저장되지 않습니다.')) return;
@@ -221,11 +229,11 @@ const CardCreateForm: React.FC = () => {
             id="카테고리"
             required
             defaultValue={{
-              value: defaultCategory || categories?.[0].category || '신규',
-              label: defaultCategory || categories?.[0].category || '신규',
+              value: defaultCategory || categories?.[0] || '신규',
+              label: defaultCategory || categories?.[0] || '신규',
             }}
             value={{ value: category, label: category }}
-            options={categories.map(({ category }) => ({
+            options={categories.map(category => ({
               label: category,
               value: category,
             }))}

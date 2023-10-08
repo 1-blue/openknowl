@@ -1,6 +1,8 @@
 import { Droppable } from 'react-beautiful-dnd';
 import styled, { css } from 'styled-components';
 
+import { combineClassName } from '@/utils/helper';
+
 import type { DroppableProps } from 'react-beautiful-dnd';
 
 const StyledDropzone = styled.ul<{ $isHorizontal: boolean }>`
@@ -34,7 +36,10 @@ const Dropzone: React.FC<React.PropsWithChildren<DropzoneProps>> = ({ children, 
           ref={provided.innerRef}
           {...provided.droppableProps}
           $isHorizontal={restProps.direction === 'horizontal'}
-          className={snapshot.draggingOverWith ? ' dnd-dropzone-hover' : ''}
+          className={combineClassName(
+            snapshot.isDraggingOver && 'dnd-dropzone-is-dragging-over',
+            snapshot.isUsingPlaceholder && 'dnd-dropzone-is-using-placeholder',
+          )}
         >
           {children}
           {provided.placeholder}

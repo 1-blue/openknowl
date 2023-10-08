@@ -16,7 +16,7 @@ const handler = async (
     const { name, category } = req.body;
 
     const targetBoard = await boardService.findOneByCategory({ category });
-    if (!targetBoard) return res.status(409).json({ message: '잘못된 데이터입니다.' });
+    if (!targetBoard) return res.status(400).json({ message: '잘못된 데이터입니다.' });
 
     const createdCard = await cardService.create({ ...req.body, boardIdx: targetBoard.idx });
 

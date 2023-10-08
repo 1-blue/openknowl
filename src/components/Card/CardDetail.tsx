@@ -7,7 +7,7 @@ import { closeCardDetail } from '@/store/slices/card';
 import useFetchCard from '@/hooks/useFetchCard';
 import useOuterClick from '@/hooks/useOuterClick';
 
-import { getPDFName } from '@/utils/board';
+import { getPDFName } from '@/utils';
 import { futureTimeFormat, pastTimeFormat } from '@/utils/time';
 
 import Skeleton from '@/components/common/Skeleton';
@@ -81,6 +81,7 @@ const StyledCardDetail = styled.ul`
     & > * {
       color: ${({ theme }) => theme.colors.gray500};
       font-size: ${({ theme }) => theme.fontSize.xs};
+      background-color: transparent;
 
       &:hover {
         color: ${({ theme }) => theme.colors.gray600};
@@ -111,7 +112,7 @@ const StyledCardDetail = styled.ul`
 /** 2023/09/25 - Card Detail Component - by 1-blue */
 const CardDetail: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { targetIdx } = useAppSelector(state => state.card);
+  const { targetIdx } = useAppSelector(state => state.card.detailState);
   const { card, isLoading, error } = useFetchCard({ idx: targetIdx });
 
   /** 2023/09/25 - PDF 다운로드 - by 1-blue */
@@ -137,14 +138,13 @@ const CardDetail: React.FC = () => {
   if (error) {
     return <Custom500 />;
   }
-  if (isLoading) {
+  if (isLoading || !card) {
     return (
       <Overlay>
         <Skeleton.BoardDetail />
       </Overlay>
     );
   }
-  if (!card) return <></>;
 
   return (
     <StyledCardDetail ref={modalRef}>
@@ -155,8 +155,7 @@ const CardDetail: React.FC = () => {
       </li>
       <li className="card-detail-list">
         <span className="card-detail-list-left">카테고리</span>
-        {/* TODO: */}
-        {/* <span className="card-detail-list-right">{card.category}</span> */}
+        <span className="card-detail-list-right">{card.board.category}</span>
       </li>
       <li className="card-detail-list">
         <span className="card-detail-list-left">플랫폼</span>

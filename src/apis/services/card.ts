@@ -2,7 +2,7 @@ import prisma from '@/prisma';
 
 import type {
   ApiCreateCardRequest,
-  // ApiUpdateCardRequest,
+  ApiUpdateCardRequest,
   ApiDeleteCardRequest,
   ApiMoveCardRequest,
 } from '@/types/apis';
@@ -41,9 +41,8 @@ export const cardService = {
           })),
         },
       },
-      include: {
-        tags: true,
-      },
+
+      include: { platform: true, tags: true, board: true },
     });
 
     return createdCard;
@@ -52,67 +51,70 @@ export const cardService = {
   async findOne({ idx }: { idx: number }) {
     const exCard = await prisma.card.findUnique({
       where: { idx },
-      include: {
-        platform: true,
-        tags: true,
-      },
+      include: { platform: true, tags: true, board: true },
     });
 
     return exCard;
   },
-  // TODO: 카테고리 고치고 수정
-  // /** 2023/10/05 - 카드 수정 - by 1-blue */
-  // async update({
-  //   exCard,
-  //   category,
-  //   platform,
-  //   idx,
-  //   date,
-  //   tags,
-  //   ...rest
-  // }: ApiUpdateCardRequest & { exCard: CardWithETC }) {
-  //   // 다른 카테고리로 이동한 경우
-  //   if (category !== exCard.categoryIdx) {
-  //     await Promise.all([
-  //       // 출발 카드 수정 ( 출발지 카테고리보다 뒤에 있는 카드 모두 순서 -1 )
-  //       await prisma.board.updateMany({
-  //         where: { order: { gt: exCard.order }, categoryIdx: exCard.categoryIdx },
-  //         data: { order: { decrement: 1 } },
-  //       }),
-  //       // 도착 카드 수정 ( 도착지 카테고리 카드 모두 순서 +1 )
-  //       await prisma.board.updateMany({
-  //         where: { category: { category } },
-  //         data: { order: { increment: 1 } },
-  //       }),
-  //     ]);
+  /** 2023/10/05 - 카드 수정 - by 1-blue */
+  async update({
+    sourceBoardIdx,
+    sourceOrder,
+    destinationBoardIdx,
+    category,
+    platform,
+    idx,
+    date,
+    tags,
+    ...rest
+  }: ApiUpdateCardRequest & {
+    sourceBoardIdx: number;
+    sourceOrder: number;
+    destinationBoardIdx: number;
+  }) {
+    // 다른 보드로 이동한 경우 ( 순서 변경 )
+    if (sourceBoardIdx !== destinationBoardIdx) {
+      await Promise.all([
+        // 출발 보드의 카드들 수정 ( 출발지 카테고리보다 뒤에 있는 카드 모두 순서 -1 )
+        await prisma.card.updateMany({
+          where: { order: { gt: sourceOrder }, boardIdx: sourceBoardIdx },
+          data: { order: { decrement: 1 } },
+        }),
+        // 도착 보드의 카드들 수정 ( 도착지 카테고리 카드 모두 순서 +1 )
+        await prisma.card.updateMany({
+          where: { boardIdx: destinationBoardIdx },
+          data: { order: { increment: 1 } },
+        }),
+      ]);
 
-  //     // 수정될 카드 도착지의 첫 번째로 이동
-  //     await prisma.board.update({
-  //       where: { idx },
-  //       data: { order: 0 },
-  //     });
-  //   }
+      // 수정될 카드 도착지의 첫 번째로 이동
+      await prisma.card.update({
+        where: { idx },
+        data: { order: 0 },
+      });
+    }
 
-  //   // FIXME: 태그 다 끊기
-  //   await prisma.board.update({
-  //     where: { idx },
-  //     data: { tags: { set: [] } },
-  //   });
+    // FIXME: 태그 다 끊기
+    await prisma.card.update({
+      where: { idx },
+      data: { tags: { set: [] } },
+    });
 
-  //   // FIXME: 수정될 데이터 업데이트 & 태그 다시 연결
-  //   const updatedBoard = await prisma.board.update({
-  //     where: { idx },
-  //     data: {
-  //       ...rest,
-  //       date: new Date(date),
-  //       category: { connect: { category } },
-  //       platform: { connect: { platform } },
-  //       tags: { connectOrCreate: tags.map(tag => ({ where: { tag }, create: { tag } })) },
-  //     },
-  //   });
+    // FIXME: 수정될 데이터 업데이트 & 태그 다시 연결
+    const updatedBoard = await prisma.card.update({
+      where: { idx },
+      data: {
+        ...rest,
+        date: new Date(date),
+        board: { connect: { idx: destinationBoardIdx } },
+        tags: { connectOrCreate: tags.map(tag => ({ where: { tag }, create: { tag } })) },
+        platform: { connect: { platform } },
+      },
+      include: { board: true, platform: true, tags: true },
+    });
 
-  //   return updatedBoard;
-  // },
+    return updatedBoard;
+  },
   /** 2023/10/05 - 카드 삭제 - by 1-blue */
   async delete({
     idx,

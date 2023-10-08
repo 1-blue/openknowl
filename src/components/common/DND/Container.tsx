@@ -7,18 +7,6 @@ const StyledContainer = styled.article`
 
   border: 2px solid ${({ theme }) => theme.colors.gray400};
   border-radius: 0.2em;
-
-  & .dnd-board-wrapper {
-    width: 280px;
-    padding: 1em;
-
-    background-color: ${({ theme }) => theme.colors.gray200};
-    border-radius: 0.2em;
-
-    &:has(.dnd-dropzone-hover) {
-      background-color: ${({ theme }) => theme.colors.main200};
-    }
-  }
 `;
 
 interface ContainerProps {

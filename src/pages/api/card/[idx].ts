@@ -9,6 +9,7 @@ import type {
   ApiUpdateCardRequest,
   ApiUpdateCardResponse,
 } from '@/types/apis';
+import { boardService } from '@/apis/services/board';
 
 const handler = async (
   req: Override<NextApiRequest, { query: ApiDeleteCardRequest; body: ApiUpdateCardRequest }>,
@@ -27,12 +28,22 @@ const handler = async (
   }
   // 특정 카드 수정
   else if (method === 'PATCH') {
-    // TODO: 카테고리 고치고 수정
-    // const updatedBoard = await cardService.update({ exCard, ...req.body });
-    // return res.status(200).json({
-    //   message: `"${exCard.name}" 카드가 수정되었습니다.`,
-    //   data: updatedBoard,
-    // });
+    const destinationBoard = await boardService.findOneByCategory({ category: req.body.category });
+
+    if (!destinationBoard) return res.status(400).json({ message: '잘못된 데이터입니다.' });
+
+    const updatedBoard = await cardService.update({
+      ...req.body,
+      sourceBoardIdx: exCard.boardIdx,
+      sourceOrder: exCard.order,
+      destinationBoardIdx: destinationBoard.idx,
+      idx,
+    });
+
+    return res.status(200).json({
+      message: `"${exCard.name}" 카드가 수정되었습니다.`,
+      data: updatedBoard,
+    });
   }
   // 특정 카드 삭제
   else if (method === 'DELETE') {

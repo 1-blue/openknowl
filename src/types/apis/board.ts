@@ -2,7 +2,7 @@ import type { Board } from '@prisma/client';
 import type { ApiResponse } from '..';
 import type { CardWithETC } from './card';
 
-interface BoardWithETC extends Board {
+export interface BoardWithETC extends Board {
   cards: CardWithETC[];
 }
 

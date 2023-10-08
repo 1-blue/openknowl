@@ -5,10 +5,11 @@ const StyledDialog = styled.aside`
   padding: 0.5em 0.3em;
   width: 120px;
   position: absolute;
-  top: 100%;
+  top: 0;
   right: -30%;
   display: flex;
   flex-flow: column nowrap;
+  transform: translateY(30px);
 
   background-color: #fff;
   box-shadow: 0px 0px 8px ${({ theme }) => theme.colors.gray300};

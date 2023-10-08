@@ -1,17 +1,20 @@
-import { useState } from 'react';
-import { useSWRConfig } from 'swr';
 import styled, { css } from 'styled-components';
 import { toast } from 'react-toastify';
 import { IoEllipsisVerticalSharp, IoTimeOutline, IoAttach } from 'react-icons/io5';
+import Link from 'next/link';
 
 import { apiDeleteCard } from '@/apis';
 
 import { useAppDispatch } from '@/store';
-import { openCardForm } from '@/store/slices/card';
+import { openUpdateCardForm } from '@/store/slices/card';
 
+import useToggle from '@/hooks/useToggle';
+import useFetchBoards from '@/hooks/useFetchBoards';
+
+import { getPDFName } from '@/utils';
 import { dateFormat, futureTimeFormat, pastTimeFormat } from '@/utils/time';
 
-import CardDialog from '@/components/Card/CardDialog';
+import Dialog from '@/components/common/Dialog';
 
 import type { CardWithETC } from '@/types/apis';
 
@@ -56,7 +59,9 @@ const StyledCard = styled.div<{ $isPast: boolean }>`
     }
     & > .card-option-button {
       margin-left: auto;
-      padding: 0.2em;
+      width: 28px;
+      height: 28px;
+      padding: 0.4em;
 
       border-radius: 50%;
       color: ${({ theme }) => theme.colors.gray400};
@@ -131,29 +136,23 @@ const StyledCard = styled.div<{ $isPast: boolean }>`
 `;
 
 interface CardProps
-  extends Pick<CardWithETC, 'idx' | 'name' | 'date' | 'platformIdx' | 'tags' | 'pdf'> {}
+  extends Pick<
+    CardWithETC,
+    'idx' | 'name' | 'date' | 'platformIdx' | 'tags' | 'pdf' | 'boardIdx'
+  > {}
 
 /** 2023/10/05 - Card Component - by 1-blue */
-const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf }) => {
-  const { mutate } = useSWRConfig();
+const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf, boardIdx }) => {
   const dispatch = useAppDispatch();
+  const { boardsMutate } = useFetchBoards();
 
-  const [isShowDialog, setIsShowDialog] = useState(false);
-
-  /** 2023/09/21 - Dialog 닫기 - by 1-blue */
-  const onOpenDialog = () => {
-    setIsShowDialog(true);
-  };
-  /** 2023/09/21 - Dialog 열기 - by 1-blue */
-  const onCloseDialog = () => {
-    setIsShowDialog(false);
-  };
+  const { isOpen, onClose, onOpen } = useToggle(false);
 
   /** 2023/09/21 - Dialog 이벤트 버블링 처리 - by 1-blue */
-  const onOpenDialogByBubbling: React.MouseEventHandler<HTMLDivElement> = e => {
+  const onClickButtonByBubbling: React.MouseEventHandler<HTMLDivElement> = e => {
     if (!(e.target instanceof HTMLElement)) return;
 
-    onCloseDialog();
+    onClose();
 
     const { type } = e.target.dataset;
 
@@ -163,18 +162,41 @@ const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf }) 
 
     // 수정
     if (type === 'update') {
-      dispatch(openCardForm({ idx }));
+      dispatch(openUpdateCardForm({ targetIdx: idx }));
     }
     // 삭제
     if (type === 'delete') {
-      apiDeleteCard({ idx }).then(({ message, data }) => {
-        if (!data) return;
+      boardsMutate(
+        boards =>
+          boards && {
+            ...boards,
+            data: boards.data?.map(board =>
+              board.idx === boardIdx
+                ? { ...board, cards: board.cards.filter(card => card.idx !== idx) }
+                : board,
+            ),
+          },
+      );
 
-        toast.success(message);
-
-        mutate('/card');
-      });
+      apiDeleteCard({ idx }).then(({ message }) => toast.success(message));
     }
+  };
+  /** 2023/09/25 - PDF 다운로드 - by 1-blue */
+  const handlePDFDownload = async () => {
+    if (!pdf) return;
+
+    const response = await fetch(pdf);
+    const file = await response.blob();
+
+    const downloadUrl = window.URL.createObjectURL(file); // 해당 file을 가리키는 url 생성
+    const anchorElement = document.createElement('a');
+
+    document.body.appendChild(anchorElement);
+    anchorElement.download = getPDFName(pdf);
+    anchorElement.href = downloadUrl;
+    anchorElement.click();
+    document.body.removeChild(anchorElement);
+    window.URL.revokeObjectURL(downloadUrl);
   };
 
   const isPast = Date.now() - new Date(date).getTime() > 0;
@@ -189,7 +211,7 @@ const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf }) 
         <IoEllipsisVerticalSharp
           role="button"
           className="card-option-button"
-          onClick={onOpenDialog}
+          onClick={() => onOpen()}
         />
       </div>
       <button type="button" className="card-platform" data-platform={platformIdx}>
@@ -214,10 +236,26 @@ const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf }) 
 
         {pdf && <IoAttach className="card-clip-icon" />}
       </div>
-      {isShowDialog && (
-        <div onClick={onOpenDialogByBubbling} style={{ margin: 0 }}>
-          <CardDialog onClose={onCloseDialog} pdfURL={pdf} />
-        </div>
+      {isOpen && (
+        <Dialog
+          onClose={onClose}
+          buttons={[
+            { type: 'update', label: '수정' },
+            { type: 'delete', label: '삭제' },
+          ]}
+          onClickButtonByBubbling={onClickButtonByBubbling}
+        >
+          {pdf && (
+            <>
+              <Link className="dialog-button" href={pdf} target="_blank">
+                PDF 보기
+              </Link>
+              <button type="button" className="dialog-button" onClick={handlePDFDownload}>
+                PDF 다운로드
+              </button>
+            </>
+          )}
+        </Dialog>
       )}
     </StyledCard>
   );

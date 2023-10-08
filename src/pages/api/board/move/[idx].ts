@@ -15,7 +15,7 @@ const handler = async (
 
   if (!exBoard) return res.status(404).json({ message: '존재하지 않는 보드입니다!' });
 
-  // 특정 카드 이동
+  // 특정 보드 이동
   if (method === 'PATCH') {
     const { sourceOrder, destinationOrder } = req.body;
 

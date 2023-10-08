@@ -1,9 +1,10 @@
-import type { Card, Platform, Tag } from '@prisma/client';
+import type { Board, Card, Platform, Tag } from '@prisma/client';
 import type { ApiResponse } from '..';
 
 export interface CardWithETC extends Card {
   tags: Tag[];
   platform: Platform;
+  board: Board;
 }
 
 /** 2023/09/18 - 특정 카드 요청 타입 - by 1-blue */
@@ -20,7 +21,7 @@ export interface ApiCreateCardRequest extends Pick<Card, 'name' | 'date' | 'pdf'
   category: string;
 }
 /** 2023/09/18 - 특정 카드 생성 응답 타입 - by 1-blue */
-export interface ApiCreateCardResponse extends ApiResponse<Card> {}
+export interface ApiCreateCardResponse extends ApiResponse<CardWithETC> {}
 
 /** 2023/09/18 - 특정 카드 수정 요청 타입 - by 1-blue */
 export interface ApiUpdateCardRequest extends Pick<Card, 'name' | 'date' | 'pdf'> {
@@ -30,7 +31,7 @@ export interface ApiUpdateCardRequest extends Pick<Card, 'name' | 'date' | 'pdf'
   tags: string[];
 }
 /** 2023/09/18 - 특정 카드 수정 응답 타입 - by 1-blue */
-export interface ApiUpdateCardResponse extends ApiResponse<Card> {}
+export interface ApiUpdateCardResponse extends ApiResponse<CardWithETC> {}
 
 /** 2023/09/18 - 특정 카드 제거 요청 타입 - by 1-blue */
 export interface ApiDeleteCardRequest {
