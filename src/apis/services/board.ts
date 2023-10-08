@@ -5,6 +5,7 @@ import type {
   ApiFindAllBoardsRequest,
   ApiDeleteBoardRequest,
   ApiCreateBoardRequest,
+  ApiUpdateBoardRequest,
 } from '@/types/apis';
 
 export const boardService = {
@@ -23,7 +24,6 @@ export const boardService = {
 
     const boards = await prisma.board.findMany({
       include: {
-        category: true,
         cards: {
           include: { platform: true, tags: true },
           where: { ...where.where },
@@ -36,7 +36,7 @@ export const boardService = {
   },
   /** 2023/10/06 - 카테고리로 특정 보드 찾기 - by 1-blue */
   async findOneByCategory({ category }: { category: string }) {
-    const exBoard = await prisma.board.findFirst({ where: { category: { category } } });
+    const exBoard = await prisma.board.findUnique({ where: { category } });
 
     return exBoard;
   },
@@ -49,6 +49,8 @@ export const boardService = {
   /** 2023/10/07 - 보드 제거 - by 1-blue */
   async delete({ idx }: ApiDeleteBoardRequest) {
     const deletedBoard = await prisma.board.delete({ where: { idx } });
+
+    // TODO: 순서 값 조정 필요
 
     return deletedBoard;
   },
@@ -63,20 +65,26 @@ export const boardService = {
     const count = await this.count();
 
     const createdBoard = await prisma.board.create({
-      data: {
-        category: {
-          create: {
-            category,
-          },
-        },
-        order: count,
-      },
-      include: {
-        cards: { include: { platform: true, tags: true } },
-        category: true,
-      },
+      data: { category, order: count },
+      include: { cards: { include: { platform: true, tags: true } } },
     });
 
     return createdBoard;
+  },
+  /** 2023/10/07 - 보드 수정 - by 1-blue */
+  async update({ currentCategory, category }: ApiUpdateBoardRequest) {
+    const updatedBoard = await prisma.board.update({
+      where: { category: currentCategory },
+      data: { category },
+      include: { cards: { include: { platform: true, tags: true } } },
+    });
+
+    return updatedBoard;
+  },
+  /** 2023/10/07 - 보드의 카테고리들 찾기 - by 1-blue */
+  async findManyCategoryOfBoard() {
+    const boards = await this.findMany({});
+
+    return boards.map(board => board.category);
   },
 };

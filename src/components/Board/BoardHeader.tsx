@@ -1,16 +1,18 @@
+import { useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useSWRConfig } from 'swr';
 import { IoEllipsisVerticalSharp } from 'react-icons/io5';
 import styled from 'styled-components';
 
 import useToggle from '@/hooks/useToggle';
 
-import { apiDeleteBoard } from '@/apis/board';
+import { apiDeleteBoard, apiUpdateBoard } from '@/apis/board';
 
 import Dialog from '@/components/common/Dialog';
 
 import type { ApiFindAllBoardsResponse } from '@/types/apis';
 
-const StyledBoardHeader = styled.div`
+const StyledBoardHeader = styled.form`
   position: relative;
   display: flex;
   align-items: center;
@@ -27,23 +29,36 @@ const StyledBoardHeader = styled.div`
 
     cursor: pointer;
   }
-  & .board-name {
-    padding: 0.4em 0.6em;
+  & .board-name-button {
+    width: 100%;
+    padding: 0.5em 0.6em;
+    text-align: left;
 
     letter-spacing: 1.5px;
-
-    border-radius: 1em;
     font-size: ${({ theme }) => theme.fontSize.xs};
     font-weight: bold;
+    background-color: transparent;
+  }
+  & .board-name-input {
+    padding: 0.5em 0.6em;
 
-    background-color: ${({ theme }) => theme.colors.main300};
+    letter-spacing: 1.5px;
+    font-size: ${({ theme }) => theme.fontSize.xs};
+    border: 1.5px solid ${({ theme }) => theme.colors.main500};
+    border-radius: 0.2em;
 
     cursor: pointer;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   & .board-option-button {
-    margin-left: auto;
-    padding: 0.2em;
+    width: 28px;
+    height: 28px;
+    padding: 0.4em;
+    margin-left: 1em;
 
     border-radius: 50%;
     color: ${({ theme }) => theme.colors.gray600};
@@ -58,13 +73,16 @@ const StyledBoardHeader = styled.div`
 
 interface BoardHeaderProps {
   idx: number;
-  category: string;
+  currentCategory: string;
 }
 
 /** 2023/10/06 - Board Header Component - by 1-blue */
-const BoardHeader: React.FC<BoardHeaderProps> = ({ idx, category }) => {
+const BoardHeader: React.FC<BoardHeaderProps> = ({ idx, currentCategory }) => {
   const { mutate } = useSWRConfig();
   const { isOpen, onOpen, onClose } = useToggle(false);
+  const [category, setCategory] = useState(currentCategory);
+  const [isInputting, setIsInputting] = useState(false);
+  const inputRef = useRef<null | HTMLInputElement>(null);
 
   /** 2023/09/21 - Dialog 이벤트 버블링 처리 - by 1-blue */
   const onClickButtonByBubbling: React.MouseEventHandler<HTMLDivElement> = e => {
@@ -96,10 +114,48 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ idx, category }) => {
     }
   };
 
+  /** 2023/10/07 - 보드 카테고리 수정 - by 1-blue */
+  const onUpdateBoard: React.FormEventHandler<HTMLFormElement> = e => {
+    e.preventDefault();
+
+    if (!category.trim().length) return toast.error('문자를 입력해주세요!');
+
+    apiUpdateBoard({ idx, currentCategory, category }).then(({ data }) => {
+      if (!data) return;
+
+      mutate<ApiFindAllBoardsResponse, ApiFindAllBoardsResponse>(
+        '/board',
+        boards =>
+          boards && {
+            ...boards,
+            data: boards.data?.map(board => (board.idx === data.idx ? data : board)),
+          },
+        { revalidate: false },
+      );
+
+      inputRef.current?.blur();
+    });
+  };
+
   return (
-    <StyledBoardHeader>
+    <StyledBoardHeader onSubmit={onUpdateBoard}>
       <input type="checkbox" className="board-header-checkbox" />
-      <span className="board-name">{category}</span>
+      {isInputting ? (
+        <input
+          className="board-name-input"
+          type="text"
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+          onBlur={() => setIsInputting(false)}
+          autoFocus
+          ref={inputRef}
+        />
+      ) : (
+        <button type="button" className="board-name-button" onClick={() => setIsInputting(true)}>
+          {category}
+        </button>
+      )}
+
       <IoEllipsisVerticalSharp
         role="button"
         className="board-option-button"

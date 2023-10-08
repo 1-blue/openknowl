@@ -5,10 +5,13 @@ import type {
   ApiCreateBoardResponse,
   ApiDeleteBoardRequest,
   ApiDeleteBoardResponse,
+  ApiUpdateBoardRequest,
+  ApiUpdateBoardResponse,
 } from '@/types/apis';
 
 type ApiDeleteBoardHandler = (body: ApiDeleteBoardRequest) => Promise<ApiDeleteBoardResponse>;
 type ApiCreateBoardHandler = (body: ApiCreateBoardRequest) => Promise<ApiCreateBoardResponse>;
+type ApiUpdateBoardHandler = (body: ApiUpdateBoardRequest) => Promise<ApiUpdateBoardResponse>;
 
 /** 2023/10/07 - 보드 삭제 - by 1-blue */
 export const apiDeleteBoard: ApiDeleteBoardHandler = async ({ idx }) => {
@@ -20,6 +23,13 @@ export const apiDeleteBoard: ApiDeleteBoardHandler = async ({ idx }) => {
 /** 2023/10/07 - 보드 생성 - by 1-blue */
 export const apiCreateBoard: ApiCreateBoardHandler = async ({ category }) => {
   const { data } = await axiosInstance.post<ApiCreateBoardResponse>(`/board`, { category });
+
+  return data;
+};
+
+/** 2023/10/08 - 보드 수정 - by 1-blue */
+export const apiUpdateBoard: ApiUpdateBoardHandler = async ({ idx, ...body }) => {
+  const { data } = await axiosInstance.patch<ApiUpdateBoardResponse>(`/board/${idx}`, body);
 
   return data;
 };

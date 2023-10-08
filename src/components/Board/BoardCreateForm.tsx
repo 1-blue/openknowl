@@ -108,6 +108,7 @@ const BoardCreateForm: React.FC = () => {
             className="board-create-input"
             value={category}
             onChange={e => setCategory(e.target.value)}
+            autoFocus
           />
           <div className="board-create-button-container">
             <button
