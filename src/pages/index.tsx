@@ -154,7 +154,7 @@ const Home = () => {
                   index={index}
                 >
                   <section className="dnd-board-wrapper">
-                    <BoardHeader idx={board.idx} category={board.category!.category} />
+                    <BoardHeader idx={board.idx} currentCategory={board.category} />
 
                     {/* Card 드랍 영역 지정 */}
                     <DND.Dropzone

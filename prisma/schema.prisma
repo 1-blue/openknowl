@@ -12,12 +12,10 @@ model Board {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   order Int
+  category String @unique
 
   // 보드와 카드 ( 1 : N )
   cards Card[]
-
-  // 보드와 카테고리 ( 1 : 1 )
-  category Category?
 }
 
 model Card {
@@ -41,12 +39,6 @@ model Card {
   tags Tag[]
 }
 
-model Category {
-  category String @id
-
-  board Board @relation(fields: [boardIdx], references: [idx], onUpdate: Cascade, onDelete: Cascade)
-  boardIdx Int @unique
-}
 model Platform {
   platform String @id
 

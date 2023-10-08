@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-import { getBoards, getCards, getCategories, getPlatforms, getTags, tags } from './dummy';
+import { getBoards, getCards, getPlatforms, getTags, tags } from './dummy';
 
 const prisma = new PrismaClient();
 
@@ -22,12 +22,6 @@ async function main() {
     await prisma.board.createMany({
       skipDuplicates: true,
       data: getBoards(),
-    });
-
-    // 더미 카테고리 생성
-    await prisma.category.createMany({
-      skipDuplicates: true,
-      data: getCategories(),
     });
 
     // 더미 카드들 생성

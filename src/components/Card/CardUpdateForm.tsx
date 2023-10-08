@@ -132,7 +132,7 @@ const CardUpdateForm: React.FC = () => {
   } = useForm<CardUpdateFormType>();
 
   // category
-  const [category, setCategory] = useState(categories?.[0].category || '신규');
+  const [category, setCategory] = useState(categories?.[0] || '신규');
   // platform
   const [platform, setPlatform] = useState(platforms?.[0].platform || '미니인턴');
   // tags
@@ -247,7 +247,7 @@ const CardUpdateForm: React.FC = () => {
               // value: card.category.category,
               // label: card.category.category,
             }}
-            options={categories.map(({ category }) => ({
+            options={categories.map(category => ({
               label: category,
               value: category,
             }))}

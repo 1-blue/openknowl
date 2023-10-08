@@ -55,7 +55,6 @@ export const cardService = {
       include: {
         platform: true,
         tags: true,
-        board: { include: { category: true } },
       },
     });
 

@@ -156,7 +156,7 @@ const CardDetail: React.FC = () => {
       <li className="card-detail-list">
         <span className="card-detail-list-left">카테고리</span>
         {/* TODO: */}
-        {/* <span className="card-detail-list-right">{card.category.category}</span> */}
+        {/* <span className="card-detail-list-right">{card.category}</span> */}
       </li>
       <li className="card-detail-list">
         <span className="card-detail-list-left">플랫폼</span>
