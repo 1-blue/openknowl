@@ -1,7 +1,9 @@
+import { useSWRConfig } from 'swr';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import { useSearchParams } from 'next/navigation';
 
+import { apiMoveBoard } from '@/apis';
 import { apiMoveCard } from '@/apis';
 
 import { buildQueryString } from '@/utils/helper';
@@ -22,10 +24,12 @@ import CardFilter from '@/components/Card/CardFilter';
 import Card from '@/components/Card/Card';
 
 import type { OnDragEndResponder } from 'react-beautiful-dnd';
+import type { ApiFindAllBoardsResponse } from '@/types/apis';
 
 /** 2023/09/18 - 메인 페이지 - by 1-blue */
 const Home = () => {
   const dispatch = useAppDispatch();
+  const { mutate } = useSWRConfig();
   const { boards, isLoading, error, boardsMutate } = useFetchBoards();
   const { categories } = useFetchCategories();
 
@@ -90,7 +94,57 @@ const Home = () => {
 
     // 보드를 Drag & Drop한 경우
     if (type === 'BOARD') {
-      console.log('source, destination, draggableId >> ', source, destination, draggableId);
+      /** 이동될 보드의 식별자 */
+      const targetIdx = +draggableId.slice(-1);
+      /** 시작 보드의 순서 */
+      const sourceOrder = source.index;
+      /** 도착 보드의 순서 */
+      const destinationOrder = destination.index;
+
+      mutate<ApiFindAllBoardsResponse, ApiFindAllBoardsResponse>(
+        '/board',
+        boards => {
+          if (!boards) return boards;
+          if (!boards.data) return boards;
+
+          let copyBoards = [...boards.data];
+
+          /** 출발 보드 인덱스 */
+          const sourceIndex = copyBoards.findIndex(board => board.order === sourceOrder);
+          /** 도착 보드 인덱스 */
+          const destinationIndex = copyBoards.findIndex(board => board.order === destinationOrder);
+
+          // 원래 위치보다 뒤로 이동하는 경우
+          if (sourceOrder < destinationOrder) {
+            copyBoards = copyBoards.map(board => {
+              if (board.order > sourceOrder && board.order <= destinationOrder) {
+                return { ...board, order: board.order - 1 };
+              }
+
+              return board;
+            });
+          }
+          // 원래 위치보다 앞으로 이동하는 경우
+          else {
+            copyBoards = copyBoards.map(board => {
+              if (board.order < sourceOrder && board.order >= destinationOrder) {
+                return { ...board, order: board.order + 1 };
+              }
+
+              return board;
+            });
+          }
+
+          const [target] = copyBoards.splice(sourceIndex, 1);
+          target.order = destinationOrder;
+
+          copyBoards.splice(destinationIndex, 0, target);
+
+          return { ...boards, data: copyBoards };
+        },
+        { revalidate: false },
+      );
+      apiMoveBoard({ idx: targetIdx, sourceOrder, destinationOrder });
     }
 
     // 카드인 경우

@@ -20,8 +20,7 @@ const handler = async (
     const { sourceBoardIdx, sourceOrder, destinationBoardIdx, destinationOrder } = req.body;
 
     const updatedBoard = await cardService.move({
-      ...req.body,
-      cardIdx: idx,
+      idx,
       sourceBoardIdx: +sourceBoardIdx,
       sourceOrder: +sourceOrder,
       destinationBoardIdx: +destinationBoardIdx,

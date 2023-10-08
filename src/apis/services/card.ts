@@ -133,16 +133,12 @@ export const cardService = {
   },
   /** 2023/10/05 - 카드 이동 - by 1-blue */
   async move({
-    cardIdx,
+    idx,
     sourceOrder,
     destinationOrder,
     sourceBoardIdx,
     destinationBoardIdx,
-  }: Pick<ApiMoveCardRequest, 'sourceOrder' | 'destinationOrder'> & {
-    cardIdx: number;
-    sourceBoardIdx: number;
-    destinationBoardIdx: number;
-  }) {
+  }: ApiMoveCardRequest) {
     // 다른 카드 이동인 경우
     if (sourceBoardIdx !== destinationBoardIdx) {
       await Promise.all([
@@ -185,7 +181,7 @@ export const cardService = {
     }
 
     const updatedCard = await prisma.card.update({
-      where: { idx: cardIdx },
+      where: { idx },
       data: { boardIdx: destinationBoardIdx, order: destinationOrder },
     });
 

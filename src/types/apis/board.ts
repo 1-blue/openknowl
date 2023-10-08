@@ -48,3 +48,12 @@ export interface ApiUpdateBoardResponse extends ApiResponse<BoardWithETC> {}
 export interface ApiFindAllCategoryOfBoardRequest {}
 /** 2023/10/07 - 보드의 모든 카테고리들 응답 타입 - by 1-blue */
 export interface ApiFindAllCategoryOfBoardResponse extends ApiResponse<string[]> {}
+
+/** 2023/10/08 - 보드 이동 요청 타입 - by 1-blue */
+export interface ApiMoveBoardRequest {
+  idx: number;
+  sourceOrder: number;
+  destinationOrder: number;
+}
+/** 2023/10/08 - 보드 이동 응답 타입 - by 1-blue */
+export interface ApiMoveBoardResponse extends ApiResponse<BoardWithETC> {}

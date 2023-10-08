@@ -6,6 +6,7 @@ import type {
   ApiDeleteBoardRequest,
   ApiCreateBoardRequest,
   ApiUpdateBoardRequest,
+  ApiMoveBoardRequest,
 } from '@/types/apis';
 
 export const boardService = {
@@ -23,6 +24,7 @@ export const boardService = {
     };
 
     const boards = await prisma.board.findMany({
+      orderBy: { order: 'asc' },
       include: {
         cards: {
           include: { platform: true, tags: true },
@@ -86,5 +88,30 @@ export const boardService = {
     const boards = await this.findMany({});
 
     return boards.map(board => board.category);
+  },
+  /** 2023/10/08 - 보드 이동 - by 1-blue */
+  async move({ idx, sourceOrder, destinationOrder }: ApiMoveBoardRequest) {
+    // 원래 위치보다 뒤로 이동하는 경우
+    if (sourceOrder < destinationOrder) {
+      await prisma.board.updateMany({
+        where: { AND: [{ order: { gt: sourceOrder } }, { order: { lte: destinationOrder } }] },
+        data: { order: { decrement: 1 } },
+      });
+    }
+    // 원래 위치보다 앞으로 이동하는 경우
+    else {
+      await prisma.board.updateMany({
+        where: { AND: [{ order: { lt: sourceOrder } }, { order: { gte: destinationOrder } }] },
+        data: { order: { increment: 1 } },
+      });
+    }
+
+    const updatedBoard = await prisma.board.update({
+      where: { idx },
+      data: { order: destinationOrder },
+      include: { cards: { include: { platform: true, tags: true } } },
+    });
+
+    return updatedBoard;
   },
 };

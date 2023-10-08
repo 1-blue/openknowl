@@ -9,5 +9,6 @@ const axiosInstance = axios.create({
 
 export default axiosInstance;
 
+export * from './board';
 export * from './card';
 export * from './s3';
