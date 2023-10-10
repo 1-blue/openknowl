@@ -63,34 +63,6 @@ async function main() {
       //       },
       //     }),
       //   ),
-      // ...Array(20)
-      //   .fill(null)
-      //   .map(() =>
-      //     prisma.card.update({
-      //       where: { idx: Math.floor(Math.random() * cardCount) + 1 },
-      //       data: {
-      //         tags: {
-      //           connect: {
-      //             tag: tags[Math.floor(Math.random() * tags.length)],
-      //           },
-      //         },
-      //       },
-      //     }),
-      //   ),
-      // ...Array(20)
-      //   .fill(null)
-      //   .map(() =>
-      //     prisma.card.update({
-      //       where: { idx: Math.floor(Math.random() * cardCount) + 1 },
-      //       data: {
-      //         tags: {
-      //           connect: {
-      //             tag: tags[Math.floor(Math.random() * tags.length)],
-      //           },
-      //         },
-      //       },
-      //     }),
-      //   ),
     ]);
   } catch (error) {
     console.error(error);

@@ -133,6 +133,7 @@ const InputFile = React.forwardRef<HTMLInputElement, Props>(
         <input
           id={id}
           className="input"
+          accept=".pdf"
           ref={e => {
             if (typeof ref === 'function') {
               ref(e);

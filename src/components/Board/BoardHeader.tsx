@@ -21,20 +21,14 @@ const StyledBoardHeader = styled.form`
     margin-left: 0.4em;
   }
 
-  & .board-header-checkbox {
-    width: 20px;
-    height: 20px;
-
-    cursor: pointer;
-  }
   & .board-name-button {
-    padding: 0.5em 0.8em;
+    padding: 0.3em 0.5em;
     text-align: left;
 
     letter-spacing: 1.5px;
-    font-size: ${({ theme }) => theme.fontSize.xs};
+    font-size: ${({ theme }) => theme.fontSize.md};
     font-weight: bold;
-    border-radius: 0.2em;
+    border-radius: 1.6em;
     background-color: ${({ theme }) => theme.colors.main400};
     color: #fff;
   }
@@ -107,7 +101,10 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ idx, currentCategory }) => {
       boardsMutate(
         boards => boards && { ...boards, data: boards?.data?.filter(board => board.idx !== idx) },
       );
-      apiDeleteBoard({ idx });
+
+      apiDeleteBoard({ idx }).then(({ message }) => {
+        toast.info(message);
+      });
     }
   };
 
@@ -117,8 +114,10 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ idx, currentCategory }) => {
 
     if (!category.trim().length) return toast.error('문자를 입력해주세요!');
 
-    apiUpdateBoard({ idx, currentCategory, category }).then(({ data }) => {
+    apiUpdateBoard({ idx, currentCategory, category }).then(({ data, message }) => {
       if (!data) return;
+
+      toast.info(message);
 
       // 보드 수정
       boardsMutate(
@@ -135,7 +134,6 @@ const BoardHeader: React.FC<BoardHeaderProps> = ({ idx, currentCategory }) => {
 
   return (
     <StyledBoardHeader onSubmit={onUpdateBoard}>
-      <input type="checkbox" className="board-header-checkbox" />
       {isInputting ? (
         <input
           className="board-name-input"

@@ -17,11 +17,16 @@ const StyledBoardCreateForm = styled.form`
   justify-content: center;
   align-items: center;
 
-  background-color: ${({ theme }) => theme.colors.gray300};
+  background-color: ${({ theme }) => theme.colors.gray200};
   border-radius: 0.4em;
+  box-shadow: 2px 2px 8px ${({ theme }) => theme.colors.gray400};
 
   transition: all 0.4s;
   cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.gray300};
+  }
 
   & .board-create-button-icon {
     width: 36px;
@@ -80,8 +85,10 @@ const BoardCreateForm: React.FC = () => {
 
     if (!category.trim().length) return toast.error('문자를 입력해주세요!');
 
-    apiCreateBoard({ category }).then(({ data }) => {
+    apiCreateBoard({ category }).then(({ data, message }) => {
       if (!data) return;
+
+      toast.info(message);
 
       boardsMutate(
         boards =>

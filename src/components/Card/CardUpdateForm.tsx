@@ -178,8 +178,9 @@ const CardUpdateForm: React.FC = () => {
       pdf: pdfURL || pdf,
     })
       .then(({ message }) => {
-        toast.success(message);
+        toast.info(message);
 
+        // TODO: 받은 데이터로 업데이트하기
         mutate('/board');
 
         dispatch(stopSpinner());

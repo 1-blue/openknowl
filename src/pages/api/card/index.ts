@@ -20,7 +20,10 @@ const handler = async (
 
     const createdCard = await cardService.create({ ...req.body, boardIdx: targetBoard.idx });
 
-    return res.status(201).json({ message: `"${name}" 카드가 생성되었습니다.`, data: createdCard });
+    return res.status(201).json({
+      message: `"${name}" 카드가 "${createdCard.board.category}"에 생성되었습니다.`,
+      data: createdCard,
+    });
   }
 };
 

@@ -175,7 +175,7 @@ const CardCreateForm: React.FC = () => {
       .then(({ message, data }) => {
         if (!data) return;
 
-        toast.success(message);
+        toast.info(message);
 
         boardsMutate(boards => {
           return {

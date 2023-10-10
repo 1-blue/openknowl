@@ -42,21 +42,14 @@ const StyledCard = styled.div<{ $isPast: boolean }>`
     display: flex;
     align-items: center;
 
-    & > .card-top-wrapper {
-      display: flex;
+    & > .card-name {
+      margin-left: 0.2em;
 
-      & > .card-checkbox {
-        width: 16px;
-        height: 16px;
-      }
-      & > .card-name {
-        margin-left: 0.2em;
-
-        line-height: 1.3em;
-        font-size: ${({ theme }) => theme.fontSize.xl};
-        font-weight: bold;
-      }
+      line-height: 1.3em;
+      font-size: ${({ theme }) => theme.fontSize.xl};
+      font-weight: bold;
     }
+
     & > .card-option-button {
       margin-left: auto;
       width: 28px;
@@ -136,13 +129,10 @@ const StyledCard = styled.div<{ $isPast: boolean }>`
 `;
 
 interface CardProps
-  extends Pick<
-    CardWithETC,
-    'idx' | 'name' | 'date' | 'platformIdx' | 'tags' | 'pdf' | 'boardIdx'
-  > {}
+  extends Pick<CardWithETC, 'idx' | 'name' | 'date' | 'tags' | 'pdf' | 'boardIdx' | 'platform'> {}
 
 /** 2023/10/05 - Card Component - by 1-blue */
-const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf, boardIdx }) => {
+const Card: React.FC<CardProps> = ({ idx, name, date, tags, pdf, boardIdx, platform }) => {
   const dispatch = useAppDispatch();
   const { boardsMutate } = useFetchBoards();
 
@@ -178,7 +168,9 @@ const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf, bo
           },
       );
 
-      apiDeleteCard({ idx }).then(({ message }) => toast.success(message));
+      apiDeleteCard({ idx }).then(({ message }) => {
+        toast.info(message);
+      });
     }
   };
   /** 2023/09/25 - PDF 다운로드 - by 1-blue */
@@ -197,6 +189,8 @@ const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf, bo
     anchorElement.click();
     document.body.removeChild(anchorElement);
     window.URL.revokeObjectURL(downloadUrl);
+
+    toast.info(`"${pdf}" PDF를 다운로드 했습니다.`);
   };
 
   const isPast = Date.now() - new Date(date).getTime() > 0;
@@ -204,18 +198,15 @@ const Card: React.FC<CardProps> = ({ idx, name, date, platformIdx, tags, pdf, bo
   return (
     <StyledCard $isPast={isPast} data-target-idx={idx}>
       <div className="card-top-container">
-        <div className="card-top-wrapper">
-          <input type="checkbox" className="card-checkbox" />
-          <span className="card-name">{name}</span>
-        </div>
+        <span className="card-name">{name}</span>
         <IoEllipsisVerticalSharp
           role="button"
           className="card-option-button"
           onClick={() => onOpen()}
         />
       </div>
-      <button type="button" className="card-platform" data-platform={platformIdx}>
-        {platformIdx}
+      <button type="button" className="card-platform" data-platform={platform.platform}>
+        {platform.platform}
       </button>
       <ul className="card-tag-container">
         {tags.map(({ tag }) => (

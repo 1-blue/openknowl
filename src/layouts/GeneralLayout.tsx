@@ -19,9 +19,9 @@ const StyledGeneralLayout = styled.div``;
 const GeneralLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { isStartSpinner } = useAppSelector(state => state.spinner);
   const {
-    isShowCardForm,
+    isOpenCardForm: isShowCardForm,
     updateState: { targetIdx },
-    isShowCardDetail,
+    isOpenCardDetail: isShowCardDetail,
   } = useAppSelector(state => state.card);
 
   return (

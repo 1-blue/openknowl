@@ -112,7 +112,7 @@ export const boardService = {
     const updatedBoard = await prisma.board.update({
       where: { idx },
       data: { order: destinationOrder },
-      include: { cards: { include: { platform: true, tags: true } } },
+      include: { cards: { include: { platform: true, tags: true, board: true } } },
     });
 
     return updatedBoard;

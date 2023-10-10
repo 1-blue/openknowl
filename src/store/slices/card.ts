@@ -3,9 +3,9 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface CardState {
   /** 카드 생성 폼을 보여줄지 여부 */
-  isShowCardForm: boolean;
+  isOpenCardForm: boolean;
   /** 카드 상세 보기 모달을 보여줄지 여부 */
-  isShowCardDetail: boolean;
+  isOpenCardDetail: boolean;
 
   createState: {
     /** 카드가 생성될 보드의 기본 카테고리 */
@@ -24,8 +24,8 @@ export interface CardState {
 }
 
 const initialState: CardState = {
-  isShowCardForm: false,
-  isShowCardDetail: false,
+  isOpenCardForm: false,
+  isOpenCardDetail: false,
 
   createState: {
     defaultCategory: '',
@@ -44,33 +44,33 @@ export const cardSlice = createSlice({
   reducers: {
     /** 일반 카드 생성 폼 열기 */
     openCreateCardForm: (state, action: PayloadAction<{ defaultCategory: string }>) => {
-      state.isShowCardForm = true;
+      state.isOpenCardForm = true;
       state.createState.defaultCategory = action.payload.defaultCategory;
     },
     /** `PDF Drag & Drop`으로 카드 생성 폼 열기 */
     openCreateCardFormByPDF: (state, action: PayloadAction<{ pdfFile: File }>) => {
-      state.isShowCardForm = true;
+      state.isOpenCardForm = true;
       state.createState.pdfFile = action.payload.pdfFile;
     },
     /** 카드 수정 폼 열기 */
     openUpdateCardForm: (state, action: PayloadAction<{ targetIdx: number }>) => {
-      state.isShowCardForm = true;
+      state.isOpenCardForm = true;
       state.updateState.targetIdx = action.payload.targetIdx;
     },
     /** 카드 생성 & 수정 폼 닫기 */
     closeCardForm: state => {
-      state.isShowCardForm = false;
+      state.isOpenCardForm = false;
       state.createState = { defaultCategory: '' };
       state.updateState = { targetIdx: -1 };
     },
     /** 카드 상세 보기 모달 열기 */
     openCardDetail: (state, action: PayloadAction<{ targetIdx: number }>) => {
-      state.isShowCardDetail = true;
+      state.isOpenCardDetail = true;
       state.detailState.targetIdx = action.payload.targetIdx;
     },
     /** 카드 상세 보기 모달 닫기 */
     closeCardDetail: state => {
-      state.isShowCardDetail = false;
+      state.isOpenCardDetail = false;
       state.detailState.targetIdx = -1;
     },
   },

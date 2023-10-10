@@ -19,16 +19,19 @@ const StyledDropzone = styled.article`
 `;
 
 interface DropzoneProps {
-  onDropExcute: (file: File) => void;
+  onDropExecute: (file: File) => void;
 }
 
 /** 2023/09/22 - Dropzone Component - by 1-blue */
-const Dropzone: React.FC<React.PropsWithChildren<DropzoneProps>> = ({ onDropExcute, children }) => {
+const Dropzone: React.FC<React.PropsWithChildren<DropzoneProps>> = ({
+  onDropExecute,
+  children,
+}) => {
   /** 2023/09/23 - Drop 이벤트 핸들러 - by 1-blue */
   const onDrop = async (files: File[]) => {
     const file = files[0];
 
-    onDropExcute(file);
+    onDropExecute(file);
   };
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ noClick: true, onDrop });
 

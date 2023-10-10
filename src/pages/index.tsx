@@ -33,7 +33,7 @@ const Home = () => {
   const searchParams = useSearchParams();
 
   /** 2023/10/04 - 드랍존에 드랍되었을 때 실행할 함수 - by 1-blue */
-  const onDropExcute = (file: File) => {
+  const onDropExecute = (file: File) => {
     if (file.type !== 'application/pdf') {
       return toast.error('PDF만 업로드 가능합니다!');
     }
@@ -231,7 +231,7 @@ const Home = () => {
         Openknowl - 프론트엔드 과제 ( 칸반보드 )
       </h1>
 
-      <Dropzone onDropExcute={onDropExcute}>
+      <Dropzone onDropExecute={onDropExecute}>
         <CardFilter />
 
         {isLoading || !boards || !categories ? (

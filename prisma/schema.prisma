@@ -32,21 +32,23 @@ model Card {
   boardIdx Int
 
   // 카드와 플랫폼 ( 1 : N )
-  platform Platform @relation(fields: [platformIdx], references: [platform], onUpdate: Cascade, onDelete: Cascade)
-  platformIdx String
+  platform Platform @relation(fields: [platformIdx], references: [idx], onUpdate: Cascade, onDelete: Cascade)
+  platformIdx Int
 
   // 카드와 태그 ( N : M )
   tags Tag[]
 }
 
 model Platform {
-  platform String @id
+  idx Int @id @default(autoincrement())
+  platform String @unique
 
   // 카드와 플랫폼 ( 1 : N )
   cards Card[]
 }
 model Tag {
-  tag String @id
+  idx Int @id @default(autoincrement())
+  tag String @unique
 
   // 카드와 태그 ( N : M )
   cards Card[]

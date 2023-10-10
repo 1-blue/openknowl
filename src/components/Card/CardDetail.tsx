@@ -169,16 +169,18 @@ const CardDetail: React.FC = () => {
             : `${futureTimeFormat(card.date)} 전`}
         </time>
       </li>
-      <li className="card-detail-list">
-        <span className="card-detail-list-left">태그들</span>
-        <ul className="card-detail-list-right card-detail-tag-container">
-          {card.tags.map(({ tag }) => (
-            <li key={tag} className="card-detail-tag">
-              {tag}
-            </li>
-          ))}
-        </ul>
-      </li>
+      {card.tags.length !== 0 && (
+        <li className="card-detail-list">
+          <span className="card-detail-list-left">태그</span>
+          <ul className="card-detail-list-right card-detail-tag-container">
+            {card.tags.map(({ tag }) => (
+              <li key={tag} className="card-detail-tag">
+                {tag}
+              </li>
+            ))}
+          </ul>
+        </li>
+      )}
       {card.pdf && (
         <>
           <li className="card-detail-list">

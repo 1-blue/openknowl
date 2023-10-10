@@ -38,7 +38,6 @@ const onError = (error: Error, key: string) => {
   }
 };
 
-// TODO: data 타입 변경하기
 const onSuccess = (data: ApiResponse<object>) => {
   data.message && toast.success(data.message);
 };
